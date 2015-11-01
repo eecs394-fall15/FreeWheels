@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "angular": "1.3.x",
-    "supersonic": "1.x"
+    "supersonic": "1.x",
+    "angularjs-google-places": "0.1.0"
   }
 }
