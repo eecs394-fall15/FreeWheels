@@ -6,29 +6,33 @@
     </super-navbar-title>
   </super-navbar>
   
-
+  <body style="height:100%">
   <button ng-click="findMeAwesomePlaces()">Use My Location</button>
   <img src="https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white2.png"/>
       <h3 ng-if="places.length > 0">Awesome Places around you:</h3>
+
+      <div id="map" style="height:100%"></div>
+
     <div ng-repeat="place in places" class="list card">
 
   <div class="item item-avatar">
-    <!-- <img src="mcfly.jpg"> -->
+    <img src={{place.icon}}>
     <h2>{{place.name}}</h2>
     <p>{{place.vicinity}}</p>
   </div>
 
   <div class="item item-body">
-    <img class="full-image" src="delorean.jpg">
+    <img class="full-image" src={{place.photo}})>
     <h3>Address:</h1> 
     </p> {{place.address}}</p>
     <h3>Contact Number:</h1> 
     </p> {{place.phone}}</p>
-    <h3>Website:</h1> 
-    </p> {{place.url}}</p>
+    <h3>Rating:</h1> 
+    </p> {{place.rating}}</p>
   </div>
 
 </div>
+</body>
 
 </div>
 

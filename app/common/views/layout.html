@@ -17,6 +17,10 @@
   <script src="/components/webcomponentsjs/webcomponents.js"></script>
   <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
   <script src="/components/angularjs-google-places/dist/angularjs-google-places.min.js"></script>
+   <script
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTTZ2uS-sHoJFyjJ0xTUI3MEouGdTAf8Y">
+   </script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTTZ2uS-sHoJFyjJ0xTUI3MEouGdTAf8Y&libraries=places"></script>
   <% _.each(yield.modules, function(module) { %>
   <script src="/app/<%= module %>.js"></script>
   <% }); %>
