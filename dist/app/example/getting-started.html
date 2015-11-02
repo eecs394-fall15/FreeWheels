@@ -24,6 +24,10 @@
   <script src="/components/webcomponentsjs/webcomponents.js"></script>
   <script src="http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
   <script src="/components/angularjs-google-places/dist/angularjs-google-places.min.js"></script>
+   <script
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTTZ2uS-sHoJFyjJ0xTUI3MEouGdTAf8Y">
+   </script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTTZ2uS-sHoJFyjJ0xTUI3MEouGdTAf8Y&libraries=places"></script>
   
   <script src="/app/common.js"></script>
   
@@ -32,31 +36,45 @@
 </head>
 <body ng-app="example">
 
-<div class="padding">
+<div class="padding" ng-controller="GettingStartedController">
 
   <super-navbar>
     <super-navbar-title>
-      Welcome to Supersonic!
+      Free Wheels
     </super-navbar-title>
   </super-navbar>
+  
+  <body style="height:100%">
+  <button ng-click="findMeAwesomePlaces()">Use My Location</button>
+  <img src="https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white2.png"/>
+      <h3 ng-if="places.length > 0">Awesome Places around you:</h3>
 
-  <p>Awesome! This file is located at <strong>app/example/views/getting-started.html</strong> &mdash; open it, change some text and save the file. The changes are updated to all connected devices. Cool, huh?</p>
+      <div id="map" style="height:100%"></div>
 
-  <p>Below, you can see our multi-page navigation in action. Tap on a button to move to a new view.</p>
+    <div ng-repeat="place in places" class="list card">
 
-  <super-navigate view-id="using-the-scanner">
-    <button class="button button-block button-positive icon-left super-wand">Using the AppGyver Scanner</button>
-  </super-navigate>
+  <div class="item item-avatar">
+    <img src={{place.icon}}>
+    <h2>{{place.name}}</h2>
+    <p>{{place.vicinity}}</p>
+  </div>
 
-  <super-navigate view-id="learn-more">
-    <button class="button button-block button-positive icon-left super-university">Learn more</button>
-  </super-navigate>
-
-  <h2>Get in touch with us!</h2>
-
-  <p>Feel free to contact us at <a href="mailto:contact@appgyver.com">contact@appgyver.com</a>, we would love to get your feedback!</p>
+  <div class="item item-body">
+    <img class="full-image" src={{place.photo}})>
+    <h3>Address:</h1> 
+    </p> {{place.address}}</p>
+    <h3>Contact Number:</h1> 
+    </p> {{place.phone}}</p>
+    <h3>Rating:</h1> 
+    </p> {{place.rating}}</p>
+  </div>
 
 </div>
+</body>
+
+</div>
+
+
 
 
 </body>
