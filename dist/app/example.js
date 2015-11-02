@@ -46,7 +46,7 @@ angular
                 placeId : result.place_id
               } 
               service.getDetails(request, function(details){
-                 var photo = details.photos[0].getUrl({'maxWidth': 35, 'maxHeight': 35});
+                 var photo = details.photos[0].getUrl({'maxWidth': 300});
                  supersonic.logger.log(photo);
                 $scope.places.push({
                     name:result.name,
