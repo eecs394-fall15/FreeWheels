@@ -2,14 +2,14 @@
 
   <super-navbar>
     <super-navbar-title>
-      Free Wheels
+      FreeWheels
     </super-navbar-title>
   </super-navbar>
   
   <body style="height:100%">
-  <button ng-click="findMeAwesomePlaces()">Use My Location</button>
+    <h4 style="text-align:center">Find Awesome Places Around You</h4>
+  <button class="button button-full button-royal" ng-click="findMeAwesomePlaces()">Use My Location</button>
   <img src="https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white2.png"/>
-      <h3 ng-if="places.length > 0">Awesome Places around you:</h3>
 
       <div id="map" style="height:100%"></div>
 
