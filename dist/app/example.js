@@ -1,6 +1,6 @@
 angular.module('example', [
   // Declare here all AngularJS dependencies that are shared by the example module.
-  'supersonic', 'ngGPlaces'
+  'supersonic', 'ngGPlaces', 'rzModule'
 ]);
 
 angular
@@ -8,34 +8,26 @@ angular
   .controller('GettingStartedController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.navbarTitle = "Settings";
     supersonic.ui.tabs.hide();
-
     $scope.places = [];
 
+    $scope.priceSlider = 500;
+    $scope.translate = function(value)
+    {
+        return value + ' m';
+    }
 
-    var lat, longi;
-    //  $scope.details = ngGPlacesAPI.placeDetails({reference:"CnRnAAAAnRm_imIW_SFd74bsj6iRwvRxBamZqtUaSyRjlb-i1vvkapOSVXyA5Dj452GSpBpno_MHbxyGsuFx9zqZvr_aa2a7uG0IZE8tC-N2OccvUC_i5N3QRQ11WmSRayo441riHebwQGqlbaf3RY-5KVsfGBIQXGtmUICHsD9LH2rd_y-J2hoUvW0lUEIHHtRnD15QyeUqi6tkHIg"})
-    //  .then(
-    // function (data) {
-    //   return data;
-    // });
+
 
    $scope.findMeAwesomePlaces = function()
    {
+      $scope.places = [];
       supersonic.device.geolocation.getPosition().then( function(position) {
-    // lat = position.coords.latitude;
-    // longi = position.coords.longitude;
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-
-      // var map = new google.maps.Map(document.getElementById('map'), {
-      //    center: myLocation,
-      //    zoom: 15,
-      //    scrollwheel: false
-      // });
 
       // Specify location, radius and place types for your Places API search.
       var request = {
           location: myLocation,
-          radius: '2000',
+          radius: $scope.priceSlider,
           types: ['art_gallery',
                   'aquarium',
                   'city_hall',
@@ -47,7 +39,8 @@ angular
                   'place_of_worship',
                   'stadium',
                   'synagogue',
-                  'natural_feature']
+                  'natural_feature',
+                  'food']
 
       };
 

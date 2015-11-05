@@ -4,7 +4,13 @@ angular
     $scope.navbarTitle = "Settings";
     supersonic.ui.tabs.hide();
     $scope.places = [];
-    $scope.priceSlider = 5000;
+
+    $scope.priceSlider = 500;
+    $scope.translate = function(value)
+    {
+        return value + ' m';
+    }
+
 
 
    $scope.findMeAwesomePlaces = function()
