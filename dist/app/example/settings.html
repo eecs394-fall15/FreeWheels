@@ -43,7 +43,7 @@
 
   <super-navbar>
     <super-navbar-title>
-      FreeWheels
+      Road Trip
     </super-navbar-title>
   </super-navbar>
   
@@ -56,7 +56,13 @@
 
     <div>
       <h5>Radius for your search:</h5>
-      <rzslider rz-slider-floor=500 rz-slider-ceil=10000 rz-slider-model="priceSlider" rz-slider-translate="translate"></rzslider>
+            <rzslider
+                rz-slider-floor="0.1"
+                rz-slider-ceil="10"
+                rz-slider-step="0.1"
+                rz-slider-precision="1"
+                rz-slider-translate="translate"
+                rz-slider-model="radiusSlider"</rzslider>
     </div>
 
   <button class="button button-full button-royal" ng-click="location1()">Evanston, IL</button>
@@ -78,11 +84,11 @@
 
   <div class="item item-body">
     <img class="full-image" src={{place.photo}})>
-    <h3>Address:</h1> 
+    <h3>Address:</h3> 
     </p> {{place.address}}</p>
-    <h3>Contact Number:</h1> 
+    <h3>Contact Number:</h3> 
     </p> {{place.phone}}</p>
-    <h3>Rating:</h1> 
+    <h3>Rating:</h3> 
     </p> {{place.rating}}</p>
   </div>
 

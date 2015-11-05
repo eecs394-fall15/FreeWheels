@@ -5,10 +5,10 @@ angular
 
     $scope.places = [];
 
-    $scope.priceSlider = 500;
+    $scope.radiusSlider = 2.0;
     $scope.translate = function(value)
     {
-        return value + ' m';
+        return value + ' mi';
     }
 
 
@@ -32,7 +32,7 @@ angular
       // Specify location, radius and place types for your Places API search.
       var request = {
           location: myLocation,
-          radius: $scope.priceSlider,
+          radius: $scope.radiusSlider * 1609.34,
           types: ['art_gallery',
                   'aquarium',
                   'city_hall',
@@ -42,7 +42,7 @@ angular
                   'museum',
                   'park',
                   'place_of_worship',
-                  'stadium',
+                  //'stadium',
                   'synagogue',
                   'natural_feature']
 
