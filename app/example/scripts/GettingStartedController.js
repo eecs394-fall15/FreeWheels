@@ -2,7 +2,7 @@ angular
   .module('example')
   .controller('GettingStartedController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.navbarTitle = "Settings";
-    supersonic.ui.tabs.hide();
+
     $scope.places = [];
 
     $scope.priceSlider = 500;
@@ -34,8 +34,7 @@ angular
                   'place_of_worship',
                   'stadium',
                   'synagogue',
-                  'natural_feature',
-                  'food']
+                  'natural_feature']
 
       };
 
