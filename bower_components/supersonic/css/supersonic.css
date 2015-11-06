@@ -7749,8 +7749,10 @@ iframe[data-module] {
   top: 0;
   left: 0;
   width: 100%;
+  height: 47px;
   z-index: 5;
-  background: linear-gradient(to bottom, #ffffff 0%, #ffffff 85%, rgba(255, 255, 255, 0) 100%); }
+  background: white;
+  border-bottom: 1px solid #CCC; }
 
 .module-tabset__tab-bar__fader-left {
   position: absolute;
@@ -7801,10 +7803,36 @@ iframe[data-module] {
   opacity: 1; }
 
 .module-tabset__content {
-  padding-top: 50px; }
+  padding-top: 47px; }
 
 .module-tabset__pane {
   display: none; }
 
 .module-tabset__pane.active {
   display: block; }
+
+/* override chrome header color with little darker */
+.chrome-header {
+  background-color: #EEEEEE; }
+
+/* make cards wide as screen */
+div.module-tabset__content > div.module-tabset__pane > div.chrome-card {
+  margin: 0;
+  box-shadow: none; }
+
+/* remove chrome card from tabs */
+div.module-tabset__content > div.module-tabset__pane:nth-child(n+2) > div > div.item.item-divider.chrome-header {
+  display: none; }
+
+div.module-tabset__content > div.module-tabset__pane:nth-child(n+2) > div.chrome-card {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0; }
+
+div.module-tabset__content > div.module-tabset__pane:nth-child(n+2) > div.chrome-card > div.item.item-text-wrap {
+  border-bottom-left-radius: none;
+  border-bottom-right-radius: none;
+  border-top-left-radius: none;
+  border-top-right-radius: none;
+  border-width: 0px;
+  border-style: none; }

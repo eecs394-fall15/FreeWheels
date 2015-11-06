@@ -1,7 +1,7 @@
 /**
  * supersonic
- * Version: 1.8.6
- * Published: 2015-10-30
+ * Version: 1.8.7
+ * Published: 2015-11-05
  * Homepage: https://github.com/AppGyver/supersonic
  * License: MIT
  */
@@ -32127,8 +32127,8 @@ module.exports = function(window) {
   };
   attachToTabset = function(tabsetElem) {
     var activateTab, panesContainer, tabIdx, tabLinkElem, tabsContainer, _i, _len, _ref, _results;
-    tabsContainer = tabsetElem.querySelectorAll(".module-tabset__tab-bar ul")[0];
-    panesContainer = tabsetElem.querySelectorAll(".module-tabset__content")[0];
+    tabsContainer = tabsetElem.querySelector(".module-tabset__tab-bar");
+    panesContainer = tabsetElem.querySelector(".module-tabset__content");
     if (tabsetElem.querySelectorAll(SELECTOR_TABS).length <= 1) {
       tabsContainer.style.display = "none";
       panesContainer.style.paddingTop = "0px";

@@ -35,11 +35,11 @@ tab-bar tab-bar-item:selected {
 }
 
 tab-bar-item#settings {
-  background-image: url(icons/cog.svg);
+  background-image: url(icons/car.png);
 }
 
 tab-bar-item#index {
-  background-image: url(icons/home.svg);
+  background-image: url(icons/locate.png);
 }
 
 tab-bar-item#internet {

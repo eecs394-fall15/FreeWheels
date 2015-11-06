@@ -2,9 +2,15 @@ angular
   .module('example')
   .controller('GettingStartedController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.navbarTitle = "Settings";
-    supersonic.ui.tabs.hide();
+
     $scope.places = [];
-    $scope.priceSlider = 5000;
+
+    $scope.radiusSlider = 2.0;
+    $scope.translate = function(value)
+    {
+        return value + ' mi';
+    }
+
 
 
    $scope.findMeAwesomePlaces = function()
@@ -16,7 +22,7 @@ angular
       // Specify location, radius and place types for your Places API search.
       var request = {
           location: myLocation,
-          radius: $scope.priceSlider,
+          radius: $scope.radiusSlider * 1609.34,
           types: ['art_gallery',
                   'aquarium',
                   'city_hall',
@@ -28,8 +34,7 @@ angular
                   'place_of_worship',
                   'stadium',
                   'synagogue',
-                  'natural_feature',
-                  'food']
+                  'natural_feature']
 
       };
 
