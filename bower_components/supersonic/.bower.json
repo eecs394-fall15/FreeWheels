@@ -1,6 +1,6 @@
 {
   "name": "supersonic",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "homepage": "https://github.com/AppGyver/supersonic",
   "authors": [
     "Eevert Saukkokoski <eevert.saukkokoski@appgyver.com>",
@@ -22,11 +22,11 @@
     "webcomponentsjs": "0.7.12",
     "steroids-js": "^3.5.15"
   },
-  "_release": "1.8.6",
+  "_release": "1.8.7",
   "_resolution": {
     "type": "version",
-    "tag": "v1.8.6",
-    "commit": "43b40f512d0ee8e4d5be98c1b966c0239bb3ba11"
+    "tag": "v1.8.7",
+    "commit": "06f05ad6eb3eb484c6bca6387f84ca091841c54d"
   },
   "_source": "git://github.com/AppGyver/supersonic-bower.git",
   "_target": "1.x",

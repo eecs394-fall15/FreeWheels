@@ -3,7 +3,36 @@
     e.preventDefault();
   });
 </script>
-<ul class="list">
+<!-- <ul class="list">
   <li class="item" onclick="supersonic.ui.drawers.close()">Home</li>
   <li class="item" onclick="supersonic.ui.drawers.close()">My Profile</li>
+</ul> -->
+
+<h3>Select Categories</h3>
+<ul class="list" ng-controller='DrawerController'>
+  <!-- <li class="item item-checkbox">
+    <label class="checkbox">
+       <input class="sports-filter" type="checkbox">
+    </label>
+    <table>
+      <tr>
+      <td>My Created Games</td>
+      </tr>
+    </table>
+  </li> -->
+  <!-- <ul class="list"> -->
+    <li class="item item-checkbox" "stylel" ng-repeat="type in typesList">
+         <label class="checkbox" >
+           <input class="sports-filter" type="checkbox">
+         </label> 
+         {{type}}
+         <!-- <table style="border:1;">
+            <tr>
+              <td style="line-height: 50%;"><img src="{{getURL(sport)}}"></td>
+              <td style="valign:top; line-height: 50%;">{{sport}}</td>
+            </tr>
+         </table> -->
+    </li>
+  </ul>
+  
 </ul>
