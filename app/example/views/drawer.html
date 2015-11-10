@@ -9,7 +9,7 @@
 </ul> -->
 
 <h3>Select Categories</h3>
-<ul class="list" ng-controller='DrawerController'>
+<ul class="list" ng-controller='GettingStartedController'>
   <!-- <li class="item item-checkbox">
     <label class="checkbox">
        <input class="sports-filter" type="checkbox">
@@ -23,15 +23,9 @@
   <!-- <ul class="list"> -->
     <li class="item item-checkbox" "stylel" ng-repeat="type in typesList">
          <label class="checkbox" >
-           <input class="sports-filter" type="checkbox">
+           <input type="checkbox" ng-model="type.checked">
          </label> 
-         {{type}}
-         <!-- <table style="border:1;">
-            <tr>
-              <td style="line-height: 50%;"><img src="{{getURL(sport)}}"></td>
-              <td style="valign:top; line-height: 50%;">{{sport}}</td>
-            </tr>
-         </table> -->
+         {{type.name}}
     </li>
   </ul>
   

@@ -6,6 +6,7 @@ angular.module('example', [
 angular
   .module('example')
   .controller('DrawerController', function($scope, supersonic) {
+  	$scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
   	$scope.typesList = ['art_gallery',
                   'aquarium',
                   'city_hall',
@@ -18,13 +19,30 @@ angular
                   'stadium',
                   'synagogue',
                   'natural_feature'];
-    
+
+                  
+
+
 
 
  })
 angular
   .module('example')
   .controller('GettingStartedController', function($scope, supersonic, ngGPlacesAPI, $http) {
+    $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
+    $scope.typesList = [
+                  {'name':'art_gallery','checked': true}, 
+                  {'name':'aquarium','checked': true},
+                  {'name':'city_hall','checked': true},
+                  {'name':'embassy','checked': true},
+                  {'name':'hindu_temple','checked': true},
+                  {'name':'mosque','checked': true},
+                  {'name':'museum','checked': true},
+                  {'name':'park','checked': true},
+                  {'name':'place_of_worship','checked': true},
+                  {'name':'stadium','checked': true},
+                  {'name':'synagogue','checked': true},
+                  {'name':'natural_feature','checked': true}];
     $scope.navbarTitle = "Settings";
 
     $scope.places = [];
