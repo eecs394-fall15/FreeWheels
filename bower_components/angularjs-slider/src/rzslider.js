@@ -4,7 +4,7 @@
  * (c) Rafal Zajac <rzajac@gmail.com>
  * http://github.com/rzajac/angularjs-slider
  *
- * Version: v1.0.0
+ * Version: v1.1.0
  *
  * Licensed under the MIT license
  */
@@ -233,6 +233,14 @@ function throttle(func, wait, options) {
     this.disabled = this.scope.rzSliderDisabled;
 
     /**
+     * The interval at which the slider updates when the model/high values
+     * are altered from outside the slider
+     *
+     * @type {number}
+     */
+    this.interval = this.scope.rzSliderInterval !== null ? this.scope.rzSliderInterval : 350;
+
+    /**
      * The delta between min and max value
      *
      * @type {number}
@@ -330,7 +338,7 @@ function throttle(func, wait, options) {
           self.updateCmbLabel();
         }
 
-      }, 350, { leading: false });
+      }, self.interval);
 
       thrHigh = throttle(function()
       {
@@ -339,7 +347,7 @@ function throttle(func, wait, options) {
         self.updateSelectionBar();
         self.updateTicksScale();
         self.updateCmbLabel();
-      }, 350, { leading: false });
+      }, self.interval);
 
       this.scope.$on('rzSliderForceRender', function()
       {
@@ -465,13 +473,16 @@ function throttle(func, wait, options) {
     {
       this.updateLowHandle(this.valueToOffset(this.scope.rzSliderModel));
 
+      /*
+      the order here is important since the selection bar should be
+      updated after the high handle but before the combined label
+       */
       if(this.range)
-      {
         this.updateHighHandle(this.valueToOffset(this.scope.rzSliderHigh));
-        this.updateCmbLabel();
-      }
-
       this.updateSelectionBar();
+      if(this.range)
+        this.updateCmbLabel();
+
       this.updateTicksScale();
     },
 
@@ -589,10 +600,12 @@ function throttle(func, wait, options) {
         this.ceilLab.rzAlwaysHide = true;
         this.minLab.rzAlwaysHide = true;
         this.maxLab.rzAlwaysHide = true;
+        this.cmbLab.rzAlwaysHide = true;
         this.hideEl(this.flrLab);
         this.hideEl(this.ceilLab);
         this.hideEl(this.minLab);
         this.hideEl(this.maxLab);
+        this.hideEl(this.cmbLab);
       }
 
       // Remove stuff not needed in single slider
@@ -655,6 +668,7 @@ function throttle(func, wait, options) {
 
       if(this.initHasRun)
       {
+        this.updateFloorLab();
         this.updateCeilLab();
         this.initHandles();
       }
@@ -672,10 +686,11 @@ function throttle(func, wait, options) {
       var positions = '',
           ticksCount = Math.round((this.maxValue - this.minValue) / this.step) + 1;
       for (var i = 0; i < ticksCount; i++) {
-        var selectedClass = this.isTickSelected(i) ? 'selected': '';
+        var value = this.roundStep(this.minValue + i * this.step);
+        var selectedClass = this.isTickSelected(value) ? 'selected': '';
         positions += '<li class="tick '+ selectedClass +'">';
         if(this.showTicksValue)
-          positions += '<span class="tick-value">'+ this.getDisplayValue(i) +'</span>';
+          positions += '<span class="tick-value">'+ this.getDisplayValue(value) +'</span>';
         positions += '</li>';
       }
       this.ticks.html(positions);
@@ -805,10 +820,6 @@ function throttle(func, wait, options) {
      */
     updateLowHandle: function(newOffset)
     {
-      var delta = Math.abs(this.minH.rzsl - newOffset);
-
-      if(this.minLab.rzsv && delta < 1) { return; }
-
       this.setLeft(this.minH, newOffset);
       this.translateFn(this.scope.rzSliderModel, this.minLab);
       this.setLeft(this.minLab, newOffset - this.minLab.rzsw / 2 + this.handleHalfWidth);
@@ -1414,6 +1425,7 @@ function throttle(func, wait, options) {
       rzSliderShowTicks: '=?',
       rzSliderShowTicksValue: '=?',
       rzSliderDisabled: '=?',
+      rzSliderInterval: '=?',
     },
 
     /**

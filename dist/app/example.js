@@ -6,25 +6,22 @@ angular.module('example', [
 angular
   .module('example')
   .controller('DrawerController', function($scope, supersonic) {
-  	$scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
-  	$scope.typesList = ['art_gallery',
-                  'aquarium',
-                  'city_hall',
-                  'embassy',
-                  'hindu_temple',
-                  'mosque',
-                  'museum',
-                  'park',
-                  'place_of_worship',
-                  'stadium',
-                  'synagogue',
-                  'natural_feature'];
-
-                  
-
-
-
-
+    $scope.typesList = [
+                  {'name':'art_gallery','checked': true}, 
+                  {'name':'aquarium','checked': true},
+                  {'name':'city_hall','checked': true},
+                  {'name':'embassy','checked': true},
+                  {'name':'hindu_temple','checked': true},
+                  {'name':'mosque','checked': true},
+                  {'name':'museum','checked': true},
+                  {'name':'park','checked': true},
+                  {'name':'place_of_worship','checked': true},
+                  {'name':'stadium','checked': true},
+                  {'name':'synagogue','checked': true},
+                  {'name':'natural_feature','checked': true}];
+    $scope.updateArray = function(){
+      supersonic.logger.log("This worked");
+    };
  })
 angular
   .module('example')
@@ -47,6 +44,10 @@ angular
 
     $scope.places = [];
 
+    supersonic.ui.drawers.whenDidClose(function() {
+      supersonic.logger.log("drawer closed");
+    });
+
     $scope.radiusSlider = 2.0;
     $scope.translate = function(value)
     {
@@ -60,6 +61,7 @@ angular
       $scope.places = [];
       supersonic.device.geolocation.getPosition().then( function(position) {
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      supersonic.logger.log($scope.typesList);
 
       // Specify location, radius and place types for your Places API search.
       var request = {

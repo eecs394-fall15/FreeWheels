@@ -19,6 +19,10 @@ angular
 
     $scope.places = [];
 
+    supersonic.ui.drawers.whenDidClose(function() {
+      supersonic.logger.log("drawer closed");
+    });
+
     $scope.radiusSlider = 2.0;
     $scope.translate = function(value)
     {
@@ -32,6 +36,7 @@ angular
       $scope.places = [];
       supersonic.device.geolocation.getPosition().then( function(position) {
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      supersonic.logger.log($scope.typesList);
 
       // Specify location, radius and place types for your Places API search.
       var request = {

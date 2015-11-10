@@ -1,5 +1,7 @@
 ## AngularJS slider directive with no external dependencies
 
+> **A refactoring is on-going, any feedback is welcome:** https://github.com/rzajac/angularjs-slider/pull/158
+
 Slider directive implementation for AngularJS, without any dependencies.
 
 - Mobile friendly
@@ -9,11 +11,21 @@ Slider directive implementation for AngularJS, without any dependencies.
 - Simple to use
 - Compatibility with jQuery Lite, ie. with full jQuery ( Thanks Jusas! https://github.com/Jusas)
 
+## Examples
+
+- **Various examples:** [http://rzajac.github.io/angularjs-slider/](http://rzajac.github.io/angularjs-slider/index.html)
+- **Slider inside Angular UI tabs:** http://jsfiddle.net/7w755fLv/
+
 ## Reporting issues
 Make sure the report is accompanied by a reproducible demo. The ideal demo is created by forking [our standard jsFiddle](http://jsfiddle.net/1ruqgnhk/), adding your own code and stripping it down to an absolute minimum needed to demonstrate the bug.
 
 ## Installation
 
+### NPM
+```
+npm i angularjs-slider
+```
+or
 ### Bower
 ```
 $ bower install --save angularjs-slider
@@ -23,11 +35,6 @@ $ bower install --save angularjs-slider
 ```javascript
 angular.module('', ['rzModule']);
 ```
-
-## Examples
-
-- **Various examples:** [http://rzajac.github.io/angularjs-slider/](http://rzajac.github.io/angularjs-slider/index.html)
-- **Slider inside Angular UI tabs:** http://jsfiddle.net/7w755fLv/
 
 ### Single slider
 
@@ -149,6 +156,10 @@ $scope.priceSlider = {
 **rz-slider-disabled**
 
 > Disable the slider (apply a special style and unbind events)
+
+**rz-slider-interval**
+
+> The interval (in ms) at which the slider DOM element updates when rz-slider-model or rz-slider-high change from outside the slider. Defaults to 350.
 
 ```javascript
 // In your controller

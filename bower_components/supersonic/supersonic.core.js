@@ -1,7 +1,7 @@
 /**
  * supersonic
- * Version: 1.8.7
- * Published: 2015-11-05
+ * Version: 1.8.9
+ * Published: 2015-11-10
  * Homepage: https://github.com/AppGyver/supersonic
  * License: MIT
  */
@@ -30944,7 +30944,7 @@ module.exports = function(steroids) {
 
 
 },{"bluebird":203}],335:[function(require,module,exports){
-var Bacon, Promise, debug, http, retryIndefinitelyWithInterval;
+var Bacon, Promise, debug;
 
 Promise = require('bluebird');
 
@@ -30952,16 +30952,11 @@ Bacon = require('baconjs');
 
 debug = require('debug')('supersonic:module:iframes');
 
-http = require('../../util/http');
-
-retryIndefinitelyWithInterval = require('../../util/retry-indefinitely-with-interval');
-
 module.exports = function(window, superglobal) {
-  var IFRAME_NAME_ATTR, IFRAME_SELECTOR, IFRAME_USE_LOAD_INDICATOR_ATTR, LOAD_INDICATOR_TEMPLATE, MODULE_ACTUAL_SRC_ATTR, MODULE_CONTAINER_SELECTION, assignModuleSourceAttributes, findAll, findAllContainers, hideLoadIndicator, iframeContentSizeChangeEvents, initRuntimeEventListeners, isRuntimeWindow, isValidFrame, observeDocumentForNewModuleIframes, observeIframeChanges, register, resize, resizeOnModuleContentChange, setLoadIndicatorTemplate, showLoadIndicator, toggleModuleVisibility, waitForLoad, whenLocalhostAvailable;
+  var IFRAME_NAME_ATTR, IFRAME_SELECTOR, IFRAME_USE_LOAD_INDICATOR_ATTR, LOAD_INDICATOR_TEMPLATE, MODULE_CONTAINER_SELECTION, findAll, findAllContainers, hideLoadIndicator, iframeContentSizeChangeEvents, initIframeGuard, initRuntimeEventListeners, isAndroid, isRuntimeWindow, isValidFrame, observeDocumentForNewModuleIframes, observeIframeChanges, register, resize, resizeOnModuleContentChange, setLoadIndicatorTemplate, showLoadIndicator, toggleModuleVisibility, waitForLoad;
   IFRAME_SELECTOR = "iframe[data-module]";
   MODULE_CONTAINER_SELECTION = ".ag__module-container";
   IFRAME_USE_LOAD_INDICATOR_ATTR = "data-module-indicate-loading";
-  MODULE_ACTUAL_SRC_ATTR = "ag-src";
   IFRAME_NAME_ATTR = "data-module-name";
   LOAD_INDICATOR_TEMPLATE = "<div class=\"super-module__load-indicator\">\n  <i class=\"icon super-loading-c\"></i>\n  &nbsp;\n  Loading\n  <b bind-module-name></b>...\n</div>";
 
@@ -30979,7 +30974,6 @@ module.exports = function(window, superglobal) {
       }
       streamOfModules = observeDocumentForNewModuleIframes();
       streamOfModules.onValue(resizeOnModuleContentChange);
-      streamOfModules.onValue(assignModuleSourceAttributes);
       return findAll().map(resizeOnModuleContentChange);
     });
   };
@@ -31009,6 +31003,43 @@ module.exports = function(window, superglobal) {
     window.document.addEventListener("DOMContentLoaded", observeIframeChanges);
     window.document.addEventListener("DOMContentLoaded", toggleModuleVisibility, false);
     return window.document.addEventListener('visibilitychange', toggleModuleVisibility, false);
+  };
+  initIframeGuard = function() {
+    if (!isRuntimeWindow() || !isAndroid()) {
+      return;
+    }
+    return Promise.delay(0).then(function() {
+      var iframe, _i, _len, _ref, _results;
+      _ref = findAll("iframe");
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        iframe = _ref[_i];
+        _results.push((function(iframe) {
+          return iframe.onload = function() {
+            var acualSrc, e, testProperty;
+            try {
+              return testProperty = iframe.contentWindow.thisDoesntExist;
+            } catch (_error) {
+              e = _error;
+              if (e instanceof DOMException && e.name === "SecurityError") {
+                acualSrc = iframe.src;
+                iframe.src = "";
+                return Promise.delay(0).then(function() {
+                  console.log("Loading of iframe failed, reloading it", acualSrc);
+                  iframe.src = acualSrc;
+                  hideLoadIndicator(iframe);
+                  return resizeOnModuleContentChange(iframe);
+                });
+              }
+            }
+          };
+        })(iframe));
+      }
+      return _results;
+    });
+  };
+  isAndroid = function() {
+    return window.FreshAndroidAPIBridge !== null;
   };
   observeDocumentForNewModuleIframes = function() {
     if ((window != null ? window.MutationObserver : void 0) == null) {
@@ -31084,6 +31115,9 @@ module.exports = function(window, superglobal) {
     iframe body is defined, which is something that should happen after
     DOMContentLoaded.
     
+    FIXME: `document.body` is also available on iframes which failed loading
+           due to Android Connection Refused bug.
+    
     The iframe element might also become invalid at any point, which we need to
     detect.
      */
@@ -31154,29 +31188,6 @@ module.exports = function(window, superglobal) {
       return contentDocumentBodyMutations(element).flatMap(addImageLoadEvents).merge(Bacon.later(500, element));
     };
   })();
-  assignModuleSourceAttributes = function() {
-    return Promise.delay(0).then(function() {
-      var module, _i, _len, _ref, _results;
-      _ref = findAll();
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        module = _ref[_i];
-        if (module.getAttribute(MODULE_ACTUAL_SRC_ATTR)) {
-          _results.push(module.src = module.getAttribute(MODULE_ACTUAL_SRC_ATTR));
-        } else {
-          _results.push(console.error("Attribute '" + MODULE_ACTUAL_SRC_ATTR + "' was empty in module", module));
-        }
-      }
-      return _results;
-    });
-  };
-  whenLocalhostAvailable = function() {
-    if (/Crosswalk/.test(navigator.userAgent)) {
-      return http.get("http://localhost/__localhost_available.html");
-    } else {
-      return Promise.resolve();
-    }
-  };
   findAllContainers = function() {
     return findAll(MODULE_CONTAINER_SELECTION);
   };
@@ -31262,9 +31273,7 @@ module.exports = function(window, superglobal) {
   Execute initial operations
    */
   initRuntimeEventListeners();
-  retryIndefinitelyWithInterval(500, function() {
-    return whenLocalhostAvailable().then(assignModuleSourceAttributes);
-  });
+  initIframeGuard();
   return {
     findAll: findAll,
     register: register,
@@ -31276,7 +31285,7 @@ module.exports = function(window, superglobal) {
 
 
 
-},{"../../util/http":371,"../../util/retry-indefinitely-with-interval":372,"baconjs":202,"bluebird":203,"debug":204}],336:[function(require,module,exports){
+},{"baconjs":202,"bluebird":203,"debug":204}],336:[function(require,module,exports){
 module.exports = function(steroids, logger, superglobal, ui, env, global, data, auth) {
   var attributes, cordovaSupport, drivers, router;
   attributes = require('./attributes')(logger, global, superglobal);
@@ -31810,14 +31819,18 @@ module.exports = function(window) {
         lastX = null;
         lastY = null;
         elem.addEventListener("touchstart", function(e) {
-          startX = e.pageX;
-          startY = e.pageY;
-          lastX = e.pageX;
-          return lastY = e.pageY;
+          var touchEvent, _ref1;
+          touchEvent = e.touches[0];
+          if (touchEvent != null) {
+            return _ref1 = [touchEvent.pageX, touchEvent.pageY, touchEvent.pageX, touchEvent.pageY], startX = _ref1[0], startY = _ref1[1], lastX = _ref1[2], lastY = _ref1[3], _ref1;
+          }
         }, false);
         elem.addEventListener("touchmove", function(e) {
-          lastX = e.pageX;
-          return lastY = e.pageY;
+          var touchEvent, _ref1;
+          touchEvent = e.touches[0];
+          if (touchEvent != null) {
+            return _ref1 = [touchEvent.pageX, touchEvent.pageY], lastX = _ref1[0], lastY = _ref1[1], _ref1;
+          }
         }, false);
         return elem.addEventListener("touchend", function() {
           if (Math.abs(startX - lastX) < treshold && Math.abs(startY - lastY) < treshold) {
@@ -35409,61 +35422,4 @@ module.exports = function() {
 
 
 
-},{}],371:[function(require,module,exports){
-var Promise, get;
-
-Promise = require('bluebird');
-
-get = (function() {
-  switch (false) {
-    case !!(typeof window !== "undefined" && window !== null ? window.XMLHttpRequest : void 0):
-      return function(url) {
-        return Promise.reject(new Error("window.XMLHttpRequest unavailable"));
-      };
-    default:
-      return function(url) {
-        return new Promise(function(resolve, reject) {
-          var xhr;
-          xhr = new XMLHttpRequest();
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState !== 4) {
-              return;
-            }
-            if (xhr.status === 200) {
-              return resolve(xhr.responseText);
-            } else {
-              return reject(xhr.responseText);
-            }
-          };
-          xhr.onerror = function(e) {
-            return reject(xhr.responseText);
-          };
-          xhr.open("GET", url, true);
-          return xhr.send(null);
-        });
-      };
-  }
-})();
-
-module.exports = {
-  get: get
-};
-
-
-
-},{"bluebird":203}],372:[function(require,module,exports){
-var Promise, retryIndefinitelyWithInterval;
-
-Promise = require('bluebird');
-
-module.exports = retryIndefinitelyWithInterval = function(interval, f) {
-  return Promise["try"](f)["catch"](function() {
-    return Promise.delay(interval).then(function() {
-      return retryIndefinitelyWithInterval(interval, f);
-    });
-  });
-};
-
-
-
-},{"bluebird":203}]},{},[296])
+},{}]},{},[296])
