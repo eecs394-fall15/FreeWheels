@@ -43,9 +43,9 @@
 
 <h3>Select Categories</h3>
 <ul class="list" ng-controller='DrawerController'>
-    <li class="item item-checkbox" "stylel" ng-repeat="type in typesList track by $index">
+    <li class="item item-checkbox" "stylel" ng-repeat="type in typesList">
          <label class="checkbox" >
-           <input type="checkbox" ng-model="typesList[$index].checked" ng-change="updateArray()">
+           <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
          </label> 
          {{type.name}}
     </li>

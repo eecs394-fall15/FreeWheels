@@ -5,19 +5,14 @@ angular
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = [];
     $scope.typesList = [
-                  {'name':'art_gallery','checked': false}, 
-                  {'name':'aquarium','checked': false},
-                  {'name':'city_hall','checked': false},
-                  {'name':'embassy','checked': false},
-                  {'name':'hindu_temple','checked': false},
-                  {'name':'mosque','checked': false},
-                  {'name':'museum','checked': false},
-                  {'name':'park','checked': false},
-                  {'name':'place_of_worship','checked': false},
-                  {'name':'stadium','checked': false},
-                  {'name':'synagogue','checked': false},
-                  {'name':'natural_feature','checked': false}];
+                  {'name':'Animals','checked': true}, 
+                  {'name':'Library','checked': true},
+                  {'name':'Museums and Art','checked': true},
+                  {'name':'Nature','checked': true},
+                  {'name':'Things to do','checked': true},
+                  {'name':'Places of worship','checked': true}];
     //$scope.navbarTitle = "Settings";
+    var categories2types = [{}]
 
     $scope.places = [];
 
@@ -85,11 +80,45 @@ angular
                   'synagogue',
                   'natural_feature'];
       // Specify location, radius and place types for your Places API search.
-      supersonic.logger.log($scope.types);
+      
+      var requestTypes = [];
+      angular.forEach($scope.types, function(type)
+      {
+        if (type == 'Places of worship'){
+          requestTypes.push('church');
+          requestTypes.push('hindu_temple');
+          requestTypes.push('synagogue');
+          requestTypes.push('place_of_worship');
+          requestTypes.push('mosque');
+        }
+        else if (type == 'Museums and Art'){
+          requestTypes.push('museum');
+          requestTypes.push('art_gallery');
+        }
+        else if (type == 'Nature'){
+          requestTypes.push('park');
+          requestTypes.push('campground');
+          requestTypes.push('natural_feature');
+        }
+        else if (type == 'Things to do'){
+          requestTypes.push('stadium');
+          requestTypes.push('casino');
+          requestTypes.push('bowling_alley');
+          requestTypes.push('amusement_park');
+        }
+        else if (type == 'Library'){
+          requestTypes.push('library');
+        }
+        else if (type == 'Animals'){
+          requestTypes.push('zoo');
+          requestTypes.push('aquarium');
+        }
+      });
+
       var request = {
           location: myLocation,
           radius: $scope.radiusSlider * 1609.34,
-          types: $scope.types.length > 0? $scope.types : defaultTypes
+          types: $scope.types.length > 0? requestTypes : defaultTypes
       };
 
     // Create the PlaceService and send the request.
