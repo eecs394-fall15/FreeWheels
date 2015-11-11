@@ -41,12 +41,13 @@
 
 
 
-<h3>Select Categories</h3>
 <ul class="list" ng-controller='DrawerController'>
+	<li class="item" style="text-align:center;font-weight:bold;font-size:150%">Select Categories</li>
     <li class="item item-checkbox" "stylel" ng-repeat="type in typesList">
          <label class="checkbox" >
            <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
          </label> 
+         <i class="icon super-{{type.icon}}"></i>
          {{type.name}}
     </li>
   </ul>
