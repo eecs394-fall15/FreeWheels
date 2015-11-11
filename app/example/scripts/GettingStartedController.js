@@ -9,10 +9,10 @@ angular
                   {'name':'Library','checked': true},
                   {'name':'Museums and Art','checked': true},
                   {'name':'Nature','checked': true},
-                  {'name':'Things to do','checked': true},
+                  {'name':'Amusement','checked': true},
                   {'name':'Places of worship','checked': true}];
     //$scope.navbarTitle = "Settings";
-    var categories2types = [{}]
+
 
     $scope.places = [];
 
@@ -100,7 +100,7 @@ angular
           requestTypes.push('campground');
           requestTypes.push('natural_feature');
         }
-        else if (type == 'Things to do'){
+        else if (type == 'Amusement'){
           requestTypes.push('stadium');
           requestTypes.push('casino');
           requestTypes.push('bowling_alley');

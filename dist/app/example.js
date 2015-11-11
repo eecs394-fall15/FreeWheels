@@ -7,11 +7,11 @@ angular
   .module('example')
   .controller('DrawerController', function($scope, supersonic) {
     $scope.typesList = [
+                  {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
                   {'name':'Library','checked': true, 'icon':'ios-book-outline'},
                   {'name':'Museums and Art','checked': true, 'icon':'ios-flask-outline'},
                   {'name':'Nature','checked': true, 'icon':'leaf'},
-                  {'name':'Things to do','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Places of worship','checked': true, 'icon':'ios-moon-outline'}];
 
 
@@ -31,10 +31,10 @@ angular
                   {'name':'Library','checked': true},
                   {'name':'Museums and Art','checked': true},
                   {'name':'Nature','checked': true},
-                  {'name':'Things to do','checked': true},
+                  {'name':'Amusement','checked': true},
                   {'name':'Places of worship','checked': true}];
     //$scope.navbarTitle = "Settings";
-    var categories2types = [{}]
+
 
     $scope.places = [];
 
@@ -122,7 +122,7 @@ angular
           requestTypes.push('campground');
           requestTypes.push('natural_feature');
         }
-        else if (type == 'Things to do'){
+        else if (type == 'Amusement'){
           requestTypes.push('stadium');
           requestTypes.push('casino');
           requestTypes.push('bowling_alley');
@@ -196,11 +196,58 @@ angular
     $scope.navbarTitle = "Settings";
 
     $scope.places = [];
+    $scope.useOriginalArray = false;
+    $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
+    $scope.types = [];
+    $scope.typesList = [
+                  {'name':'Animals','checked': true}, 
+                  {'name':'Library','checked': true},
+                  {'name':'Museums and Art','checked': true},
+                  {'name':'Nature','checked': true},
+                  {'name':'Amusement','checked': true},
+                  {'name':'Places of worship','checked': true}];
 
     $scope.radiusSlider = 2.0;
     $scope.translate = function(value)
     {
         return value + ' mi';
+    }
+
+    supersonic.data.channel('filters').subscribe( function(message) {
+      $scope.typesList = message;
+      $scope.types = filterTypes($scope.typesList);
+      supersonic.logger.log($scope.types);
+      $scope.filteredPlaces = filterExistingPlaces($scope.types);
+      supersonic.logger.log($scope.places);
+      supersonic.logger.log($scope.filteredPlaces);
+      $scope.useOriginalArray = false;
+    });
+
+    var filterExistingPlaces = function(types)
+    {
+      var filteredPlaces = [];
+          angular.forEach(types, function(type)
+          {
+              angular.forEach($scope.places, function(place)
+              {
+                    angular.forEach(place.types, function(placeType)
+                    {
+                          if(placeType == type)
+                            filteredPlaces.push(place);
+                    });
+              });
+          });
+          return filteredPlaces;
+    }
+    var filterTypes = function(list)
+    {
+      var filteredArray = [];
+      angular.forEach(list, function(value, key)
+      {
+          if(value.checked == true)
+            filteredArray.push(value.name);
+      });
+        return filteredArray;
     }
 
 
@@ -218,14 +265,11 @@ angular
 
    var findMeAwesomePlaces = function(lat, longitude)
    {
+      $scope.useOriginalArray = true;
       $scope.places = [];
+      $scope.filteredPlaces = [];
       var myLocation = new google.maps.LatLng(lat, longitude);
-
-      // Specify location, radius and place types for your Places API search.
-      var request = {
-          location: myLocation,
-          radius: $scope.radiusSlider * 1609.34,
-          types: ['art_gallery',
+      var defaultTypes = ['art_gallery',
                   'aquarium',
                   'city_hall',
                   'embassy',
@@ -234,9 +278,48 @@ angular
                   'museum',
                   'park',
                   'place_of_worship',
-                  //'stadium',
+                  'stadium',
                   'synagogue',
-                  'natural_feature']
+                  'natural_feature'];
+                  var requestTypes = [];
+      angular.forEach($scope.types, function(type)
+      {
+        if (type == 'Places of worship'){
+          requestTypes.push('church');
+          requestTypes.push('hindu_temple');
+          requestTypes.push('synagogue');
+          requestTypes.push('place_of_worship');
+          requestTypes.push('mosque');
+        }
+        else if (type == 'Museums and Art'){
+          requestTypes.push('museum');
+          requestTypes.push('art_gallery');
+        }
+        else if (type == 'Nature'){
+          requestTypes.push('park');
+          requestTypes.push('campground');
+          requestTypes.push('natural_feature');
+        }
+        else if (type == 'Amusement'){
+          requestTypes.push('stadium');
+          requestTypes.push('casino');
+          requestTypes.push('bowling_alley');
+          requestTypes.push('amusement_park');
+        }
+        else if (type == 'Library'){
+          requestTypes.push('library');
+        }
+        else if (type == 'Animals'){
+          requestTypes.push('zoo');
+          requestTypes.push('aquarium');
+        }
+      });
+
+      // Specify location, radius and place types for your Places API search.
+      var request = {
+          location: myLocation,
+          radius: $scope.radiusSlider * 1609.34,
+          types: $scope.types.length > 0? requestTypes : defaultTypes
 
       };
 
