@@ -1,6 +1,6 @@
 angular.module('example', [
   // Declare here all AngularJS dependencies that are shared by the example module.
-  'supersonic', 'ngGPlaces', 'rzModule'
+  'supersonic', 'ngGPlaces', 'rzModule', 'ngMap'
 ]);
 
 angular
@@ -22,7 +22,42 @@ angular
  })
 angular
   .module('example')
-  .controller('GettingStartedController', function($scope, supersonic, ngGPlacesAPI, $http) {
+  .controller('LearnMoreController', function($scope, supersonic) {
+
+    $scope.navbarTitle = "Learn More";
+
+  });
+
+angular
+  .module('example')
+  .controller('MapController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap) {
+	$scope.navbarTitle = "MAP";
+
+  	supersonic.device.geolocation.getPosition().then( function(position) {
+      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
+      supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
+  	});
+
+    NgMap.getMap().then(function(map) {
+    	map.addListener('click', function(e) {
+		   placeMarkerAndPanTo(e.latLng, map);
+		});
+    });
+
+	function placeMarkerAndPanTo(latLng, map) {
+	  var marker = new google.maps.Marker({
+	    position: latLng,
+	    map: map
+	  });
+	  map.panTo(latLng);
+	}
+
+});
+angular
+  .module('example')
+  .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
+    
     $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = [];
@@ -43,6 +78,7 @@ angular
     {
         return value + ' mi';
     }
+
 
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
@@ -184,17 +220,9 @@ angular
 });
 angular
   .module('example')
-  .controller('LearnMoreController', function($scope, supersonic) {
-
-    $scope.navbarTitle = "Learn More";
-
-  });
-
-angular
-  .module('example')
-  .controller('SettingsController', function($scope, supersonic, ngGPlacesAPI, $http) {
+  .controller('RoadTripController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.navbarTitle = "Settings";
-
+    $scope.my = { newPlaces: false };
     $scope.places = [];
     $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
@@ -211,6 +239,11 @@ angular
     $scope.translate = function(value)
     {
         return value + ' mi';
+    }
+
+    $scope.newPlacesNearby = function()
+    {
+      $scope.my.newPlaces = true;
     }
 
     supersonic.data.channel('filters').subscribe( function(message) {

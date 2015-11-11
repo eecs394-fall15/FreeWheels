@@ -34,11 +34,11 @@ tab-bar tab-bar-item:selected {
   color: #1596f7;
 }
 
-tab-bar-item#settings {
+tab-bar-item#roadtrip {
   background-image: url(icons/car.png);
 }
 
-tab-bar-item#index {
+tab-bar-item#nearby {
   background-image: url(icons/locate.png);
 }
 

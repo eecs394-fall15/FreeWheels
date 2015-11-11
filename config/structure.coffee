@@ -6,13 +6,18 @@ module.exports =
   tabs: [
     {
       title: "Nearby Search"
-      id: "index"
-      location: "example#getting-started" # Supersonic module#view type navigation
+      id: "nearby"
+      location: "example#nearby" # Supersonic module#view type navigation
     }
     {
       title: "Road Trip"
-      id: "settings"
-      location: "example#settings"
+      id: "roadtrip"
+      location: "example#roadtrip"
+    }
+    {
+      title: "Map"
+      id: "map"
+      location: "example#map"
     }
   ]
 

@@ -1,0 +1,58 @@
+<div ng-controller="RoadTripController">
+
+  <super-navbar>
+    <super-navbar-title>
+      Road Trip
+    </super-navbar-title>
+  </super-navbar>
+  
+  <body style="height:100%">
+
+  <ul class="list" ng-show="my.newPlaces"><li class="item" style="text-align:center; background-color: #2A1838; color: white">New places found nearby</li></ul>
+ 
+    <h4 style="text-align:center" ng-click="newPlacesNearby()">Find Awesome Places On Your Trip</h4><br>
+
+    <div>
+      <h5>Radius for your search:</h5>
+            <rzslider
+                rz-slider-floor="0.1"
+                rz-slider-ceil="10"
+                rz-slider-step="0.1"
+                rz-slider-precision="1"
+                rz-slider-translate="translate"
+                rz-slider-model="radiusSlider"</rzslider>
+    </div>
+
+  <button class="button button-full button-royal" ng-click="location1()">Evanston, IL</button>
+  <button class="button button-full button-balanced" ng-click="location2()">South Bend, IN</button>
+  <button class="button button-full button-energized" ng-click="location3()">Ann Arbor, MI</button>
+
+
+  <img src="https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white2.png"/>
+
+      <div id="map" style="height:100%"></div>
+
+    <div ng-repeat="place in places" class="list card">
+
+  <div class="item item-avatar">
+    <img src={{place.icon}}>
+    <h2>{{place.name}}</h2>
+    <p>{{place.vicinity}}</p>
+  </div>
+
+  <div class="item item-body">
+    <img class="full-image" src={{place.photo}})>
+    <h3>Address:</h3> 
+    </p> {{place.address}}</p>
+    <h3>Contact Number:</h3> 
+    </p> {{place.phone}}</p>
+    <h3>Rating:</h3> 
+    </p> {{place.rating}}</p>
+  </div>
+
+</div>
+</body>
+
+</div>
+
+
