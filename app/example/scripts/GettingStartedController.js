@@ -1,27 +1,25 @@
 angular
   .module('example')
   .controller('GettingStartedController', function($scope, supersonic, ngGPlacesAPI, $http) {
+    $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
+    $scope.types = [];
     $scope.typesList = [
-                  {'name':'art_gallery','checked': true}, 
-                  {'name':'aquarium','checked': true},
-                  {'name':'city_hall','checked': true},
-                  {'name':'embassy','checked': true},
-                  {'name':'hindu_temple','checked': true},
-                  {'name':'mosque','checked': true},
-                  {'name':'museum','checked': true},
-                  {'name':'park','checked': true},
-                  {'name':'place_of_worship','checked': true},
-                  {'name':'stadium','checked': true},
-                  {'name':'synagogue','checked': true},
-                  {'name':'natural_feature','checked': true}];
-    $scope.navbarTitle = "Settings";
+                  {'name':'art_gallery','checked': false}, 
+                  {'name':'aquarium','checked': false},
+                  {'name':'city_hall','checked': false},
+                  {'name':'embassy','checked': false},
+                  {'name':'hindu_temple','checked': false},
+                  {'name':'mosque','checked': false},
+                  {'name':'museum','checked': false},
+                  {'name':'park','checked': false},
+                  {'name':'place_of_worship','checked': false},
+                  {'name':'stadium','checked': false},
+                  {'name':'synagogue','checked': false},
+                  {'name':'natural_feature','checked': false}];
+    //$scope.navbarTitle = "Settings";
 
     $scope.places = [];
-
-    supersonic.ui.drawers.whenDidClose(function() {
-      supersonic.logger.log("drawer closed");
-    });
 
     $scope.radiusSlider = 2.0;
     $scope.translate = function(value)
@@ -29,20 +27,52 @@ angular
         return value + ' mi';
     }
 
+    supersonic.data.channel('filters').subscribe( function(message) {
+      $scope.typesList = message;
+      $scope.types = filterTypes($scope.typesList);
+      supersonic.logger.log($scope.types);
+      $scope.filteredPlaces = filterExistingPlaces($scope.types);
+      supersonic.logger.log($scope.places);
+      supersonic.logger.log($scope.filteredPlaces);
+      $scope.useOriginalArray = false;
+    });
 
+    
+    var filterExistingPlaces = function(types)
+    {
+      var filteredPlaces = [];
+          angular.forEach(types, function(type)
+          {
+              angular.forEach($scope.places, function(place)
+              {
+                    angular.forEach(place.types, function(placeType)
+                    {
+                          if(placeType == type)
+                            filteredPlaces.push(place);
+                    });
+              });
+          });
+          return filteredPlaces;
+    }
+    var filterTypes = function(list)
+    {
+      var filteredArray = [];
+      angular.forEach(list, function(value, key)
+      {
+          if(value.checked == true)
+            filteredArray.push(value.name);
+      });
+        return filteredArray;
+    }
 
    $scope.findMeAwesomePlaces = function()
    {
+      $scope.useOriginalArray = true;
       $scope.places = [];
+      $scope.filteredPlaces = [];
       supersonic.device.geolocation.getPosition().then( function(position) {
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-      supersonic.logger.log($scope.typesList);
-
-      // Specify location, radius and place types for your Places API search.
-      var request = {
-          location: myLocation,
-          radius: $scope.radiusSlider * 1609.34,
-          types: ['art_gallery',
+      var defaultTypes = ['art_gallery',
                   'aquarium',
                   'city_hall',
                   'embassy',
@@ -53,8 +83,13 @@ angular
                   'place_of_worship',
                   'stadium',
                   'synagogue',
-                  'natural_feature']
-
+                  'natural_feature'];
+      // Specify location, radius and place types for your Places API search.
+      supersonic.logger.log($scope.types);
+      var request = {
+          location: myLocation,
+          radius: $scope.radiusSlider * 1609.34,
+          types: $scope.types.length > 0? $scope.types : defaultTypes
       };
 
     // Create the PlaceService and send the request.
@@ -68,8 +103,9 @@ angular
                 placeId : result.place_id
               } 
               service.getDetails(request, function(details){
+                if(details != null && details.photos != undefined && details.photos != null)
+                {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
-                 supersonic.logger.log(photo);
                 $scope.places.push({
                     name:result.name,
                     icon: result.icon,
@@ -86,6 +122,7 @@ angular
                   return b.rating - a.rating;
                 });
                 $scope.$apply();
+              }
               });
             });
         }
