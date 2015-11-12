@@ -125,7 +125,7 @@ angular
                 returnValue =  true;       
               }
               break;
-             case "Things to do":
+             case "Amusement":
               if(placeType == "stadium" || placeType == "casino"
                 || placeType == "bowling_alley" || placeType == "amusement_park" )
               {
