@@ -31,12 +31,6 @@
       "id": "roadtrip",
       "title": "Road Trip",
       "target_url": "http://localhost/app/example/roadtrip.html"
-    },
-    {
-      "position": 2,
-      "id": "map",
-      "title": "Map",
-      "target_url": "http://localhost/app/example/map.html"
     }
   ],
   "configuration": {

@@ -14,11 +14,6 @@ module.exports =
       id: "roadtrip"
       location: "example#roadtrip"
     }
-    {
-      title: "Map"
-      id: "map"
-      location: "example#map"
-    }
   ]
 
   # rootView:
