@@ -1,11 +1,10 @@
 <div class="padding" ng-controller="NearbyController">
 
-  <super-navbar>
-    <super-navbar-title>
+  <super-navbar> 
+    <super-navbar-title>   
       Nearby Search
     </super-navbar-title>
   </super-navbar>
-  
   <body style="height:100%">
     <h4 style="text-align:center">Find Awesome Places Around You</h4><br>
 
@@ -35,7 +34,8 @@
       </div>
 
       <div class="item item-body">
-        <img class="full-image" src={{place.photo}})>
+        <img class="full-image" src={{place.photo}}>
+        <super-navigate class="button button-positive" location="example#navigate" data-params-id="{{place.name}}"> Navigate</super-navigate>
         <h3>Address:</h3> 
         </p> {{place.address}}</p>
         <h3>Contact Number:</h3> 

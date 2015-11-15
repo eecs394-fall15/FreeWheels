@@ -1,7 +1,6 @@
 angular
   .module('example')
   .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
-    
     $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = ["Animals", "Library", "Museums and Art", "Nature", "Things to do", "Places of worship"] ;
@@ -19,11 +18,23 @@ angular
     $scope.filteredPlaces = [];
 
     $scope.radiusSlider = 2.0;
+
     $scope.translate = function(value)
     {
         return value + ' mi';
     }
 
+     $scope.navigate = function(name)
+     {
+        supersonic.data.channel('navigate').publish(name);
+       // supersonic.logger.log("NearbyController: " + name);
+        var modalView = new supersonic.ui.View("example#navigate");
+        var options = {
+            animate: true
+      }
+
+        supersonic.ui.modal.show(modalView, options);
+     }
 
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
@@ -238,7 +249,8 @@ angular
                     phone: details.formatted_phone_number,
                     rating: result.rating,
                     photo: photo,
-                    types: result.types
+                    types: result.types,
+                    url:"https://www.google.com/maps/place/{{result.name}}"
                   });
                 $scope.places = $scope.places.sort(function(a,b){
                   if (!a.rating){return 1;}
