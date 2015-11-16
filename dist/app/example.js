@@ -279,6 +279,7 @@ angular
                 if(details != null && details.photos != undefined && details.photos != null)
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
+                 var navstring = "http://maps.google.com/maps?daddr="+result.geometry.location.toUrlValue();
                 $scope.places.push({
                     name:result.name,
                     icon: result.icon,
@@ -288,7 +289,8 @@ angular
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
-                    url:"https://www.google.com/maps/place/{{result.name}}"
+                    url:"https://www.google.com/maps/place/{{result.name}}",
+                    navstr: navstring
                   });
                 $scope.places = $scope.places.sort(function(a,b){
                   if (!a.rating){return 1;}
@@ -459,6 +461,7 @@ angular
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
                  supersonic.logger.log(photo);
+                 var navstring = "http://maps.google.com/maps?daddr="+result.geometry.location.toUrlValue();
                 $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -467,15 +470,16 @@ angular
                     phone: details.formatted_phone_number,
                     rating: result.rating,
                     photo: photo,
-                    types: result.types
+                    types: result.types,
+                    navstr: navstring
                   });
-                supersonic.logger.log("162:" + $scope.places.length);
+                // supersonic.logger.log("162:" + $scope.places.length);
                 $scope.places = $scope.places.sort(function(a,b){
                   if (!a.rating){return 1;}
                   if (!b.rating){return -1;}
                   return b.rating - a.rating;
                 });
-                 supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
+                 // supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                 callback($scope.previousPlaces, $scope.places); 
                 $scope.$apply();
               }
