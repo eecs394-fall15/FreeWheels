@@ -111,6 +111,10 @@
     "path": "testapp/events.html",
     "title": null
   },
+  "geojson.html": {
+    "path": "testapp/geojson.html",
+    "title": null
+  },
   "groundoverlay-simple.html": {
     "path": "testapp/groundoverlay-simple.html",
     "title": null
@@ -230,6 +234,16 @@
   "map-geolocation.html": {
     "path": "testapp/map-geolocation.html",
     "title": null
+  },
+  "map-gulp-usemin.html": {
+    "path": "testapp/map-gulp-usemin.html",
+    "title": "Simle Map",
+    "description": "Simple Map",
+    "keywords": "ng-map,AngularJS,center"
+  },
+  "map-initialized-callback.html": {
+    "path": "testapp/map-initialized-callback.html",
+    "title": "Map Initialized Callback"
   },
   "map-initialized.html": {
     "path": "testapp/map-initialized.html",

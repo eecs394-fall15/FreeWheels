@@ -30,8 +30,15 @@ angular
 
 angular
   .module('example')
-  .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
+  .controller('NavigateController', function($scope, supersonic) {
     
+    supersonic.ui.views.current.whenVisible( function(){
+      $scope.name = steroids.view.params.id;
+    });
+  })
+angular
+  .module('example')
+  .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = ["Animals", "Library", "Museums and Art", "Nature", "Things to do", "Places of worship"] ;
@@ -49,11 +56,23 @@ angular
     $scope.filteredPlaces = [];
 
     $scope.radiusSlider = 2.0;
+
     $scope.translate = function(value)
     {
         return value + ' mi';
     }
 
+     $scope.navigate = function(name)
+     {
+        supersonic.data.channel('navigate').publish(name);
+       // supersonic.logger.log("NearbyController: " + name);
+        var modalView = new supersonic.ui.View("example#navigate");
+        var options = {
+            animate: true
+      }
+
+        supersonic.ui.modal.show(modalView, options);
+     }
 
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
@@ -155,7 +174,7 @@ angular
                 returnValue =  true;       
               }
               break;
-             case "Things to do":
+             case "Amusement":
               if(placeType == "stadium" || placeType == "casino"
                 || placeType == "bowling_alley" || placeType == "amusement_park" )
               {
@@ -205,7 +224,9 @@ angular
                   'library'
                   ];
       // Specify location, radius and place types for your Places API search.
-      
+      $scope.openGoogleMaps = function(navigateURL){
+        supersonic.app.openURL(navigateURL);
+      }
       var requestTypes = [];
       angular.forEach($scope.types, function(type)
       {
@@ -260,6 +281,7 @@ angular
                 if(details != null && details.photos != undefined && details.photos != null)
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
+                 var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
                 $scope.places.push({
                     name:result.name,
                     icon: result.icon,
@@ -268,7 +290,9 @@ angular
                     phone: details.formatted_phone_number,
                     rating: result.rating,
                     photo: photo,
-                    types: result.types
+                    types: result.types,
+                    url:"https://www.google.com/maps/place/{{result.name}}",
+                    navstr: navstring
                   });
                 $scope.places = $scope.places.sort(function(a,b){
                   if (!a.rating){return 1;}
@@ -363,6 +387,9 @@ angular
    $scope.location3 = function(){
    	 findMeAwesomePlaces(42.2780475,-83.7404128);
    } 
+  $scope.openGoogleMaps = function(navigateURL){
+    supersonic.app.openURL(navigateURL);
+  }
 
    var findMeAwesomePlaces = function(myLocation, callback)
    {
@@ -439,6 +466,7 @@ angular
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
                  supersonic.logger.log(photo);
+                 var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
                 $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -447,15 +475,16 @@ angular
                     phone: details.formatted_phone_number,
                     rating: result.rating,
                     photo: photo,
-                    types: result.types
+                    types: result.types,
+                    navstr: navstring
                   });
-                supersonic.logger.log("162:" + $scope.places.length);
+                // supersonic.logger.log("162:" + $scope.places.length);
                 $scope.places = $scope.places.sort(function(a,b){
                   if (!a.rating){return 1;}
                   if (!b.rating){return -1;}
                   return b.rating - a.rating;
                 });
-                 supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
+                 // supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                 callback($scope.previousPlaces, $scope.places); 
                 $scope.$apply();
               }

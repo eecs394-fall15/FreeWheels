@@ -1,4 +1,4 @@
-/*! steroids-js - v3.5.16 - 2015-10-01 13:45 */
+/*! steroids-js - v3.5.18 - 2015-11-17 15:12 */
 (function(window){
 var Bridge,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -206,10 +206,24 @@ FreshAndroidBridge = (function(_super) {
   return FreshAndroidBridge;
 
 })(Bridge);
-;var ModuleBridge,
+;var ModuleBridge, debug,
+  __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+debug = (function() {
+  switch (false) {
+    case !((localStorage.debug != null) && (localStorage.debug || "").indexOf("steroids") !== -1):
+      return function() {
+        var args;
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return console.log.apply(console, ["ModuleBridge: "].concat(__slice.call(args)));
+      };
+    default:
+      return function() {};
+  }
+})();
 
 ModuleBridge = (function(_super) {
   __extends(ModuleBridge, _super);
@@ -228,7 +242,7 @@ ModuleBridge = (function(_super) {
   ModuleBridge.prototype.sendMessageToNative = function(messageString) {
     var failSilentlyMethods, failed, failureOptions, message, successOptions, _ref;
     message = JSON.parse(messageString);
-    console.log("ModuleBridge: ", message);
+    debug(message);
     failed = false;
     successOptions = {};
     failureOptions = {};
@@ -254,7 +268,7 @@ ModuleBridge = (function(_super) {
         break;
       default:
         if (_ref = message.method, __indexOf.call(failSilentlyMethods, _ref) < 0) {
-          console.log("ModuleBridge: unsupported API method: " + message.method);
+          debug("unsupported API method: " + message.method);
         }
         failed = true;
     }
@@ -294,9 +308,23 @@ AndroidBridge = (function(_super) {
   return AndroidBridge;
 
 })(Bridge);
-;var WebBridge,
+;var WebBridge, debug,
+  __slice = [].slice,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+debug = (function() {
+  switch (false) {
+    case !((localStorage.debug != null) && (localStorage.debug || "").indexOf("steroids") !== -1):
+      return function() {
+        var args;
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return console.log.apply(console, ["WebBridge: "].concat(__slice.call(args)));
+      };
+    default:
+      return function() {};
+  }
+})();
 
 WebBridge = (function(_super) {
   __extends(WebBridge, _super);
@@ -318,11 +346,11 @@ WebBridge = (function(_super) {
         }
       }, false);
       source.addEventListener("open", function(e) {
-        return console.log("Monitoring updates from steroids npm.");
+        return debug("Monitoring updates from steroids npm.");
       }, false);
       source.addEventListener("error", function(e) {
         if (e.readyState === EventSource.CLOSED) {
-          return console.log("No longer monitoring updates from steroids npm.");
+          return debug("No longer monitoring updates from steroids npm.");
         }
       });
     } else {
@@ -350,7 +378,7 @@ WebBridge = (function(_super) {
     var closeButton, failed, failureOptions, message, modal, successOptions,
       _this = this;
     message = JSON.parse(messageString);
-    console.log("WebBridge: ", message);
+    debug(message);
     failed = false;
     successOptions = {};
     failureOptions = {};
@@ -386,7 +414,7 @@ WebBridge = (function(_super) {
         document.body.appendChild(closeButton);
         break;
       default:
-        console.log("WebBridge: unsupported API method: " + message.method);
+        debug("unsupported API method: " + message.method);
         failed = true;
     }
     if (failed) {
@@ -628,7 +656,7 @@ Events = (function() {
       msg: "dispatched visibilitychanged"
     });
     visibilityChangeCustomEvent = document.createEvent("CustomEvent");
-    visibilityChangeCustomEvent.initCustomEvent("visibilitychange", true, true);
+    visibilityChangeCustomEvent.initCustomEvent("visibilitychange", true, true, {});
     return document.dispatchEvent(visibilityChangeCustomEvent);
   };
 
@@ -4029,8 +4057,10 @@ Keyboard = (function(_super) {
   return Keyboard;
 
 })(EventsSupport);
-;var PostMessage,
+;var PostMessage, isMobile,
   __slice = [].slice;
+
+isMobile = /AppGyver|Crosswalk/.test(navigator.userAgent);
 
 PostMessage = (function() {
   function PostMessage() {}
@@ -4053,20 +4083,27 @@ PostMessage = (function() {
     };
   })(window);
 
-  PostMessage.postMessage = function(message, targetOrigin) {
-    var escapedJSONMessage;
-    escapedJSONMessage = escape(JSON.stringify(message));
-    steroids.nativeBridge.nativeCall({
-      method: "broadcastJavascript",
-      parameters: {
-        javascript: "steroids.PostMessage.dispatchMessageEvent('" + escapedJSONMessage + "', '*');"
-      },
-      successCallbacks: [],
-      failureCallbacks: [],
-      recurringCallbacks: []
-    });
-    return PostMessage.originalPostMessage(message, targetOrigin);
-  };
+  PostMessage.postMessage = (function() {
+    var _this = this;
+    switch (false) {
+      case !!isMobile:
+        return PostMessage.originalPostMessage;
+      default:
+        return function(message, targetOrigin) {
+          var escapedJSONMessage;
+          escapedJSONMessage = escape(JSON.stringify(message));
+          return steroids.nativeBridge.nativeCall({
+            method: "broadcastJavascript",
+            parameters: {
+              javascript: "steroids.PostMessage.dispatchMessageEvent('" + escapedJSONMessage + "', '*');"
+            },
+            successCallbacks: [],
+            failureCallbacks: [],
+            recurringCallbacks: []
+          });
+        };
+    }
+  }).call(this);
 
   PostMessage.dispatchMessageEvent = function(escapedJSONMessage, targetOrigin) {
     return setTimeout(function() {
@@ -4150,7 +4187,7 @@ Spinner = (function() {
 ;var _this = this;
 
 window.steroids = {
-  version: "3.5.16",
+  version: "3.5.18",
   Animation: Animation,
   File: File,
   views: {
