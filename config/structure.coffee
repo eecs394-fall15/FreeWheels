@@ -28,15 +28,13 @@ module.exports =
       id: "using-the-scanner"
       location: "example#using-the-scanner"
     }
+    {
+      id: "Settings"
+      location: "example#Settings"
+    }
   ]
 
-  drawers:
-    left:
-      id: "leftDrawer"
-      location: "example#drawer"
-      showOnAppLoad: false
-    options:
-      animation: "swingingDoor"
+
   # drawers:
   #   left:
   #     id: "leftDrawer"

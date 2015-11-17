@@ -2,6 +2,7 @@ angular
   .module('example')
   .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.useOriginalArray = false;
+    $scope.filterView = new supersonic.ui.View("example#Settings");
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = ["Animals", "Library", "Museums and Art", "Nature", "Things to do", "Places of worship"] ;
     $scope.typesList = [
@@ -19,6 +20,37 @@ angular
 
     $scope.radiusSlider = 2.0;
 
+    $scope.start = function(dest, isModal) {
+  var viewId=dest,
+      view=new supersonic.ui.View({
+        location: dest,
+        id: viewId
+      });
+  view.isStarted().then(function(started) {
+    if (started) {
+      if (isModal) {supersonic.ui.modal.show(view);}
+      else {supersonic.ui.layers.push(view);}
+    } else {
+      // Start Spinner
+      supersonic.ui.views.start(view).then(function() {
+        if (isModal) {supersonic.ui.modal.show(view);}
+        else {supersonic.ui.layers.push(view);}
+        // Stop Spinner
+      }, function(error) {
+        // Stop Spinner
+        A.error(error);
+      });
+    }
+  });
+};
+    $scope.openFilterView = function(){
+      //var modalView = new supersonic.ui.View("example#Settings");
+    var options = {
+      animate: true
+    }
+    $scope.start('example#Settings',true);
+    //supersonic.ui.modal.show($scope.filterView, options);
+    }
     $scope.translate = function(value)
     {
         return value + ' mi';

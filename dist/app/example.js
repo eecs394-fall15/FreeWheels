@@ -30,6 +30,36 @@ angular
 
 angular
   .module('example')
+  .controller('MapController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap) {
+	$scope.navbarTitle = "MAP";
+	$scope.marker = null;
+  	supersonic.device.geolocation.getPosition().then( function(position) {
+      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
+      supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
+  	});
+
+    NgMap.getMap().then(function(map) {
+    	map.addListener('click', function(e) {
+		   placeMarkerAndPanTo(e.latLng, map);
+		});
+    });
+
+	function placeMarkerAndPanTo(latLng, map) {
+	 if ($scope.marker){
+	   $scope.marker.setMap(null);
+	}
+	  var marker = new google.maps.Marker({
+	    position: latLng,
+	    map: map
+	  });
+	  $scope.marker = marker;
+	  map.panTo(latLng);
+	}
+
+});
+angular
+  .module('example')
   .controller('NavigateController', function($scope, supersonic) {
     
     supersonic.ui.views.current.whenVisible( function(){
@@ -40,6 +70,7 @@ angular
   .module('example')
   .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.useOriginalArray = false;
+    $scope.filterView = new supersonic.ui.View("example#Settings");
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = ["Animals", "Library", "Museums and Art", "Nature", "Things to do", "Places of worship"] ;
     $scope.typesList = [
@@ -57,6 +88,37 @@ angular
 
     $scope.radiusSlider = 2.0;
 
+    $scope.start = function(dest, isModal) {
+  var viewId=dest,
+      view=new supersonic.ui.View({
+        location: dest,
+        id: viewId
+      });
+  view.isStarted().then(function(started) {
+    if (started) {
+      if (isModal) {supersonic.ui.modal.show(view);}
+      else {supersonic.ui.layers.push(view);}
+    } else {
+      // Start Spinner
+      supersonic.ui.views.start(view).then(function() {
+        if (isModal) {supersonic.ui.modal.show(view);}
+        else {supersonic.ui.layers.push(view);}
+        // Stop Spinner
+      }, function(error) {
+        // Stop Spinner
+        A.error(error);
+      });
+    }
+  });
+};
+    $scope.openFilterView = function(){
+      //var modalView = new supersonic.ui.View("example#Settings");
+    var options = {
+      animate: true
+    }
+    $scope.start('example#Settings',true);
+    //supersonic.ui.modal.show($scope.filterView, options);
+    }
     $scope.translate = function(value)
     {
         return value + ' mi';
@@ -543,3 +605,30 @@ angular
     map.panTo(latLng);
   }
 });
+angular
+  .module('example')
+  .controller('SettingsController', function($scope, supersonic){
+  	 $scope.typesList = [
+                  {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
+                  {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
+                  {'name':'Library','checked': true, 'icon':'ios-book-outline'},
+                  {'name':'Museums and Art','checked': true, 'icon':'ios-flask-outline'},
+                  {'name':'Nature','checked': true, 'icon':'leaf'},
+                  {'name':'Places of worship','checked': true, 'icon':'ios-moon-outline'}];
+
+
+   $scope.submitFilters = function()
+   {
+        supersonic.data.channel('filters').publish($scope.typesList);
+        //window.localStorage.setItem("typesList",$scope.typesList);
+      }
+
+   $scope.removeView = function(){
+   	var options = {
+  		animate: false
+	}
+
+	supersonic.ui.modal.hide();
+
+   }
+  }); //ngGPlacesAPI, $http, NgMap, $timeout) {

@@ -1,0 +1,25 @@
+<div class="padding" ng-controller="SettingsController">
+
+  <super-navbar>
+  <super-navbar-button ng-click="removeView()">
+    Back
+  </super-navbar-button>
+    <super-navbar-title>
+      Settings
+    </super-navbar-title>
+  </super-navbar>
+  
+  <body style="height:100%">
+<ul class="list">
+  <li class="item" style="text-align:center;font-weight:bold;font-size:150%">Select Categories</li>
+    <li class="item item-checkbox" "stylel" ng-repeat="type in typesList">
+         <label class="checkbox" >
+           <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
+         </label> 
+         <i class="icon super-{{type.icon}}"></i>
+         {{type.name}}
+    </li>
+  </ul>
+
+
+</div>
