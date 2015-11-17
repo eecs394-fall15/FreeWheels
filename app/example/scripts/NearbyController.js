@@ -18,7 +18,6 @@ angular
     $scope.places = [];
     $scope.filteredPlaces = [];
 
-    $scope.radiusSlider = 2.0;
 
     $scope.start = function(dest, isModal) {
   var viewId=dest,
@@ -68,6 +67,9 @@ angular
         supersonic.ui.modal.show(modalView, options);
      }
 
+    supersonic.data.channel('radius').subscribe( function(value){
+      $scope.radius = value;
+    })
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
