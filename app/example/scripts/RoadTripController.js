@@ -76,6 +76,9 @@ angular
    $scope.location3 = function(){
    	 findMeAwesomePlaces(42.2780475,-83.7404128);
    } 
+  $scope.openGoogleMaps = function(navigateURL){
+    supersonic.app.openURL(navigateURL);
+  }
 
    var findMeAwesomePlaces = function(myLocation, callback)
    {
@@ -152,7 +155,7 @@ angular
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
                  supersonic.logger.log(photo);
-                 var navstring = "http://maps.google.com/maps?daddr="+result.geometry.location.toUrlValue();
+                 var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
                 $scope.places.push({
                     name: result.name,
                     icon: result.icon,

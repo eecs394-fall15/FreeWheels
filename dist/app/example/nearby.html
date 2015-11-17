@@ -78,7 +78,7 @@
       <div class="item item-body">
         <img class="full-image" src={{place.photo}}>
         <!-- <super-navigate class="button button-positive" location="example#navigate" data-params-id="{{place.name}}"> Navigate</super-navigate> -->
-        <a class="button button-calm" ng-href="{{place.navstr}}">Navigate</a>
+        <button class="button button-calm" ng-click="openGoogleMaps(place.navstr)">Navigate</button>
         <h3>Address:</h3> 
         </p> {{place.address}}</p>
         <h3>Contact Number:</h3> 

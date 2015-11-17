@@ -26,12 +26,6 @@ angular.module('ngMap', []);
      * @param obj  an object to add into a collection, i.e. marker, shape
      */
     vm.addObject = function(groupName, obj) {
-      /**
-       * objects, i.e. markers and shapes, are initialized before
-       * map is initialized so, we collect those objects, then,
-       * we will add to map when map is initialized
-       * However the case as in ng-repeat, we can directly add to map
-       */
       if (vm.map) {
         vm.map[groupName] = vm.map[groupName] || {};
         var len = Object.keys(vm.map[groupName]).length;
@@ -170,10 +164,6 @@ angular.module('ngMap', []);
       vm.observeAttrSetObj(orgAttrs, $attrs, vm.map);
       vm.singleInfoWindow = mapOptions.singleInfoWindow;
 
-      /**
-       * set map for scope and controller and broadcast map event
-       * however an `mapInitialized` event will be emitted every time.
-       */
       google.maps.event.addListenerOnce(vm.map, "idle", function () {
         NgMap.addMap(vm);
         if (mapOptions.zoomToIncludeMarkers) {
@@ -182,6 +172,11 @@ angular.module('ngMap', []);
         //TODO: it's for backward compatibiliy. will be removed
         $scope.map = vm.map;
         $scope.$emit('mapInitialized', vm.map);
+
+        //callback
+        if ($attrs.mapInitialized) {
+          $parse($attrs.mapInitialized)($scope, {map: vm.map});
+        }
       });
     };
 
@@ -206,10 +201,16 @@ angular.module('ngMap', []);
     vm.ngMapDiv = NgMap.getNgMapDiv($element[0]);
     $element.append(vm.ngMapDiv);
 
-    if (!options.lazyInit) { // allows controlled initialization
+    if (options.lazyInit) { // allows controlled initialization
+      vm.map = {id: $attrs.id}; //set empty, not real, map
+      NgMap.addMap(vm);
+    } else {
       vm.initializeMap();
     }
 
+    $element.bind('$destroy', function() {
+      NgMap.deleteMap(vm);
+    });
   }; // __MapController
 
   __MapController.$inject = [
@@ -528,12 +529,12 @@ angular.module('ngMap', []);
     $timeout = _$timeout_;
     $compile = _$compile_;
     NgMap = _NgMap_;
-    setCustomMarker();
 
     return {
       restrict: 'E',
       require: ['?^map','?^ngMap'],
       compile: function(element) {
+        setCustomMarker();
         element[0].style.display ='none';
         var orgHtml = element.html();
         var matches = orgHtml.match(/{{([^}]+)}}/g);
@@ -1077,40 +1078,42 @@ angular.module('ngMap', []);
       mapController.addObject('infoWindows', infoWindow);
       mapController.observeAttrSetObj(orgAttrs, attrs, infoWindow);
 
-      NgMap.getMap().then(function(map) {
+      mapController.map.showInfoWindow = mapController.map.showInfoWindow ||
+        function(p1, p2, p3) { //event, id, marker
+          var id = typeof p1 == 'string' ? p1 : p2;
+          var marker = typeof p1 == 'string' ? p2 : p3;
+          if (typeof marker == 'string') {
+            marker = mapController.map.markers[marker];
+          }
 
+          var infoWindow = mapController.map.infoWindows[id];
+          var anchor = marker ? marker : (this.getPosition ? this : null);
+          infoWindow.__open(mapController.map, scope, anchor);
+          if(mapController.singleInfoWindow) {
+            if(mapController.lastInfoWindow) {
+              scope.hideInfoWindow(mapController.lastInfoWindow);
+            }
+            mapController.lastInfoWindow = id;
+          }
+        };
+
+      mapController.map.hideInfoWindow = mapController.map.hideInfoWindow ||
+        function(p1, p2) {
+          var id = typeof p1 == 'string' ? p1 : p2;
+          var infoWindow = mapController.map.infoWindows[id];
+          infoWindow.close();
+        };
+
+      //TODO DEPRECATED
+      scope.showInfoWindow = mapController.map.showInfoWindow;
+      scope.hideInfoWindow = mapController.map.hideInfoWindow;
+
+      NgMap.getMap().then(function(map) {
         infoWindow.visible && infoWindow.__open(map, scope);
         if (infoWindow.visibleOnMarker) {
           var markerId = infoWindow.visibleOnMarker;
           infoWindow.__open(map, scope, map.markers[markerId]);
         }
-
-        map.showInfoWindow = map.showInfoWindow ||
-          function(p1, p2, p3) { //event, id, marker
-            var id = typeof p1 == 'string' ? p1 : p2;
-            var marker = typeof p1 == 'string' ? p2 : p3;
-            var infoWindow = mapController.map.infoWindows[id];
-            var anchor = marker ? marker : (this.getPosition ? this : null);
-            infoWindow.__open(mapController.map, scope, anchor);
-            if(mapController.singleInfoWindow) {
-              if(mapController.lastInfoWindow) {
-                scope.hideInfoWindow(mapController.lastInfoWindow);
-              }
-              mapController.lastInfoWindow = id;
-            }
-          };
-
-        map.hideInfoWindow = scope.hideInfoWindow ||
-          function(p1, p2) {
-            var id = typeof p1 == 'string' ? p1 : p2;
-            var infoWindow = mapController.map.infoWindows[id];
-            infoWindow.close();
-          };
-
-        //TODO DEPRECATED
-        scope.showInfoWindow = map.showInfoWindow;
-        scope.hideInfoWindow = map.hideInfoWindow;
-
       });
 
     }; //link
@@ -1407,6 +1410,9 @@ angular.module('ngMap', []);
  * Initialize a Google map within a `<div>` tag
  *   with given options and register events
  *
+ * @attr {Expression} map-initialized 
+ *   callback function when map is initialized
+ *   e.g., map-initialized="mycallback(map)"
  * @attr {Expression} geo-callback if center is an address or current location,
  *   the expression is will be executed when geo-lookup is successful.
  *   e.g., geo-callback="showMyStoreInfo()"
@@ -1423,10 +1429,6 @@ angular.module('ngMap', []);
  * @attr {Boolean} default-style
  *  When false, the default styling,
  *  `display:block;height:300px`, will be ignored.
- * @attr {String} init-event The name of event to initialize this map.
- *  If given, the map won't be initialized until the event is received.
- *  To invoke the event, use $scope.$emit or $scope.$broacast.
- *  e.g., <map init-event="init-map" ng-click="$emit('init-map')"></map>
  * @attr {String} &lt;MapOption> Any Google map options,
  *  https://developers.google.com/maps/documentation/javascript/reference?csw=1#MapOptions
  * @attr {String} &lt;MapEvent> Any Google map events,
@@ -2733,7 +2735,17 @@ console.log('attrValue', attrValue);
    */
   var addMap = function(mapCtrl) {
     var len = Object.keys(mapControllers).length;
-    mapControllers[mapCtrl.id || len] = mapCtrl;
+    mapControllers[mapCtrl.map.id || len] = mapCtrl;
+  };
+
+  /**
+   * @memberof NgMap
+   * @function deleteMap
+   * @param mapController {__MapContoller} a map controller
+   */
+  var deleteMap = function(mapCtrl) {
+    var len = Object.keys(mapControllers).length - 1;
+    delete mapControllers[mapCtrl.map.id || len];
   };
 
   /**
@@ -2892,6 +2904,7 @@ console.log('attrValue', attrValue);
       return {
         defaultOptions: defaultOptions,
         addMap: addMap,
+        deleteMap: deleteMap,
         getMap: getMap,
         initMap: initMap,
         getStyle: getStyle,

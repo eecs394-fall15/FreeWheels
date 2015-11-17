@@ -186,7 +186,9 @@ angular
                   'library'
                   ];
       // Specify location, radius and place types for your Places API search.
-      
+      $scope.openGoogleMaps = function(navigateURL){
+        supersonic.app.openURL(navigateURL);
+      }
       var requestTypes = [];
       angular.forEach($scope.types, function(type)
       {
@@ -241,7 +243,7 @@ angular
                 if(details != null && details.photos != undefined && details.photos != null)
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
-                 var navstring = "http://maps.google.com/maps?daddr="+result.geometry.location.toUrlValue();
+                 var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
                 $scope.places.push({
                     name:result.name,
                     icon: result.icon,
