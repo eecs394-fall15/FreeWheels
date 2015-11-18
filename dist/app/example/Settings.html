@@ -43,33 +43,25 @@
 <div class="padding" ng-controller="SettingsController">
 
   <super-navbar>
-  <super-navbar-button ng-click="removeView()">
-    Back
-  </super-navbar-button>
+
+    <super-navbar-button ng-click="removeView()">
+      Back
+    </super-navbar-button>
+
     <super-navbar-title>
       Settings
     </super-navbar-title>
+
   </super-navbar>
   
   <body style="height:100%">
 
 
-<ul class="list" >
-
-  <li class="item" style="text-align:center;font-weight:bold;font-size:150%" ng-click = "hideFilters()">Select Categories</li>
-  <div class = "types" ng-hide = "hideFilter">
-    <li class="item item-checkbox" "stylel" ng-repeat="type in typesList">
-         <label class="checkbox" >
-           <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
-         </label> 
-         <i class="icon super-{{type.icon}}"></i>
-         {{type.name}}
-    </li>
-  </ul>
-</div>
-
-   <div>
-      <h5>Radius for your search:</h5>
+<div class="list" >
+    <div class="item item-divider" style="font-weight:bold;font-size:125%">
+      Search Radius
+    </div>
+    <div class="item">
       <rzslider
                 rz-slider-floor="0.1"
                 rz-slider-ceil="10"
@@ -79,7 +71,22 @@
                 rz-slider-model="radiusSlider"</rzslider>
     </div>
 
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFilters()">
+    Select Categories 
+    <i class="{{categoriesIcon}}"></i>
+  </div>
+    <div class = "types" ng-hide = "hideFilter">
+      <div class="item item-checkbox" "stylel" ng-repeat="type in typesList">
+           <label class="checkbox" >
+             <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
+           </label> 
+           <i class="icon super-{{type.icon}}"></i>
+           {{type.name}}
+      </div>
+    </div>
+  </div>
 </div>
+
 
 </body>
 </html>

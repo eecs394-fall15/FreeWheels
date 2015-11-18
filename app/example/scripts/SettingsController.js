@@ -2,6 +2,8 @@ angular
   .module('example')
   .controller('SettingsController', function($scope, supersonic){
   	$scope.radiusSlider = 2.0;
+    var toggleIcon = 0;
+    $scope.categoriesIcon = "super-chevron-down";
   	 $scope.typesList = [
                   {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
@@ -29,6 +31,14 @@ angular
 
    $scope.hideFilters = function(){
    	$scope.hideFilter = !$scope.hideFilter;
+    if (toggleIcon == 0){
+      $scope.categoriesIcon = "super-chevron-up";
+      toggleIcon = 1;
+    }
+    else{
+      $scope.categoriesIcon = "super-chevron-down";
+      toggleIcon = 0;
+    }
    }
 
    $scope.translate = function(value){

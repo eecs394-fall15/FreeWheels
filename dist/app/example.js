@@ -30,36 +30,6 @@ angular
 
 angular
   .module('example')
-  .controller('MapController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap) {
-	$scope.navbarTitle = "MAP";
-	$scope.marker = null;
-  	supersonic.device.geolocation.getPosition().then( function(position) {
-      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
-      supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
-  	});
-
-    NgMap.getMap().then(function(map) {
-    	map.addListener('click', function(e) {
-		   placeMarkerAndPanTo(e.latLng, map);
-		});
-    });
-
-	function placeMarkerAndPanTo(latLng, map) {
-	 if ($scope.marker){
-	   $scope.marker.setMap(null);
-	}
-	  var marker = new google.maps.Marker({
-	    position: latLng,
-	    map: map
-	  });
-	  $scope.marker = marker;
-	  map.panTo(latLng);
-	}
-
-});
-angular
-  .module('example')
   .controller('NavigateController', function($scope, supersonic) {
     
     supersonic.ui.views.current.whenVisible( function(){
@@ -611,6 +581,8 @@ angular
   .module('example')
   .controller('SettingsController', function($scope, supersonic){
   	$scope.radiusSlider = 2.0;
+    var toggleIcon = 0;
+    $scope.categoriesIcon = "super-chevron-down";
   	 $scope.typesList = [
                   {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
@@ -638,6 +610,14 @@ angular
 
    $scope.hideFilters = function(){
    	$scope.hideFilter = !$scope.hideFilter;
+    if (toggleIcon == 0){
+      $scope.categoriesIcon = "super-chevron-up";
+      toggleIcon = 1;
+    }
+    else{
+      $scope.categoriesIcon = "super-chevron-down";
+      toggleIcon = 0;
+    }
    }
 
    $scope.translate = function(value){
