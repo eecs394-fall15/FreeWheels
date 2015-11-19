@@ -53,7 +53,7 @@
   
   <body style="height:100%">
 
-  <ul class="list" ng-show="my.newPlaces"><li class="item" style="text-align:center; background-color: #2A1838; color: white">New Places Found</li></ul>
+  <ul class="list" ng-show="my.newPlaces"><li class="item" style="text-align:center; background-color: #2A1838; color: white" ng-click="pushNewPlaces()">New Places Found</li></ul>
 <!--     <div>
       <h5>Radius for your search:</h5>
             <rzslider
@@ -71,7 +71,7 @@
 
       <div id="map" style="height:100%"></div>
 
-    <div ng-repeat="place in places" class="list card">
+    <div ng-repeat="place in visibleplaces" class="list card">
 
   <div class="item item-avatar">
     <img src={{place.icon}}>

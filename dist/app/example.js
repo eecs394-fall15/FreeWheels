@@ -108,7 +108,7 @@ angular
 
     supersonic.data.channel('radius').subscribe( function(value){
       $scope.radiusSlider = value;
-    })
+    });
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
@@ -350,15 +350,17 @@ angular
 });
 angular
   .module('example')
-  .controller('RoadTripController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap, $timeout) {
+  .controller('RoadTripController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap, $timeout, $interval) {
     $scope.navbarTitle = "Settings";
     $scope.filterView = new supersonic.ui.View("example#Settings");
     $scope.my = { newPlaces: false };
     $scope.places = [];
+    $scope.visibleplaces = [];
     $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = [];
     $scope.filteredPlaces = [];
+    $scope.latlng = new google.maps.LatLng(42.0563195,-87.6969445);
 
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
@@ -373,10 +375,26 @@ angular
         return value + ' mi';
     }
 
+    var refreshPlaces = function() {
+      $scope.previousPlaces = $scope.places.slice();
+     findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
+      supersonic.logger.log(angular.toJson($scope.visibleplaces));
+      if (!compareArrays(arr1, arr2)){
+        newPlacesNearby();
+      }
+     });
+    }
+
+    $interval(refreshPlaces, 30000);
+
     var newPlacesNearby = function()
     {
       $scope.my.newPlaces = true;
-      $timeout(function() {$scope.my.newPlaces = false;}, 3000);
+    }
+
+    $scope.pushNewPlaces = function() {
+      $scope.visibleplaces = $scope.places;
+      $scope.my.newPlaces = false;
     }
 
         $scope.start = function(dest, isModal) {
@@ -448,18 +466,6 @@ angular
         return filteredArray;
     }
 
-
-   $scope.location1 = function(){
-   	 findMeAwesomePlaces(42.0564634,-87.6774557);
-   } 
-
-   $scope.location2 = function(){
-   	 findMeAwesomePlaces( 41.7055756,-86.2375275);
-   } 
-
-   $scope.location3 = function(){
-   	 findMeAwesomePlaces(42.2780475,-83.7404128);
-   } 
   $scope.openGoogleMaps = function(navigateURL){
     supersonic.app.openURL(navigateURL);
   }
@@ -579,14 +585,8 @@ angular
     NgMap.getMap().then(function(map) {
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
-       $scope.previousPlaces = $scope.places.slice();
-       findMeAwesomePlaces(e.latLng, function(arr1, arr2) {
-        if (!compareArrays(arr1, arr2)){
-          newPlacesNearby();
-        }
-       });
-
-       
+       $scope.latlng = e.latLng;
+       // refreshPlaces();
       });
     });
 

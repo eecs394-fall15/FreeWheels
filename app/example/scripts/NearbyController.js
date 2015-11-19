@@ -70,7 +70,7 @@ angular
 
     supersonic.data.channel('radius').subscribe( function(value){
       $scope.radiusSlider = value;
-    })
+    });
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
