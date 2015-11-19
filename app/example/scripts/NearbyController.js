@@ -1,3 +1,4 @@
+
 angular
   .module('example')
   .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
@@ -68,7 +69,7 @@ angular
      }
 
     supersonic.data.channel('radius').subscribe( function(value){
-      $scope.radius = value;
+      $scope.radiusSlider = value;
     })
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
@@ -193,13 +194,18 @@ angular
           return returnValue;
     }
 
+     $scope.openGoogleMaps = function(navigateURL){
+        supersonic.app.openURL(navigateURL);
+      }
 
    $scope.findMeAwesomePlaces = function()
    {
+      supersonic.logger.log("in findMeAwesomePlaces");
       $scope.useOriginalArray = true;
       $scope.places = [];
       $scope.filteredPlaces = [];
       supersonic.device.geolocation.getPosition().then( function(position) {
+        supersonic.logger.log("LAT:" + position.coords.latitude);
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       var defaultTypes = ['art_gallery',
                   'aquarium',
@@ -220,9 +226,6 @@ angular
                   'library'
                   ];
       // Specify location, radius and place types for your Places API search.
-      $scope.openGoogleMaps = function(navigateURL){
-        supersonic.app.openURL(navigateURL);
-      }
       var requestTypes = [];
       angular.forEach($scope.types, function(type)
       {
@@ -256,7 +259,7 @@ angular
           requestTypes.push('aquarium');
         }
       });
-
+  supersonic.logger.log("RADIUS LINE 262" + $scope.radiusSlider);
       var request = {
           location: myLocation,
           radius: $scope.radiusSlider * 1609.34,
@@ -267,7 +270,9 @@ angular
     // Handle the callback with an anonymous function.
       var service = new google.maps.places.PlacesService(map);
        service.nearbySearch(request, function(results, status) {
+        supersonic.logger.log("success");
           if (status == google.maps.places.PlacesServiceStatus.OK) {
+            supersonic.logger.log("details");
             angular.forEach(results, function(result)
             {
                    request = {

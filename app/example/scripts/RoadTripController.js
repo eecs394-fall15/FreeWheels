@@ -2,11 +2,14 @@ angular
   .module('example')
   .controller('RoadTripController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap, $timeout) {
     $scope.navbarTitle = "Settings";
+    $scope.filterView = new supersonic.ui.View("example#Settings");
     $scope.my = { newPlaces: false };
     $scope.places = [];
     $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = [];
+    $scope.filteredPlaces = [];
+
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
                   {'name':'Library','checked': true},
@@ -15,7 +18,6 @@ angular
                   {'name':'Amusement','checked': true},
                   {'name':'Places of worship','checked': true}];
 
-    $scope.radiusSlider = 2.0;
     $scope.translate = function(value)
     {
         return value + ' mi';
@@ -25,6 +27,38 @@ angular
     {
       $scope.my.newPlaces = true;
       $timeout(function() {$scope.my.newPlaces = false;}, 3000);
+    }
+
+        $scope.start = function(dest, isModal) {
+  var viewId=dest,
+      view=new supersonic.ui.View({
+        location: dest,
+        id: viewId
+      });
+  view.isStarted().then(function(started) {
+    if (started) {
+      if (isModal) {supersonic.ui.modal.show(view);}
+      else {supersonic.ui.layers.push(view);}
+    } else {
+      // Start Spinner
+      supersonic.ui.views.start(view).then(function() {
+        if (isModal) {supersonic.ui.modal.show(view);}
+        else {supersonic.ui.layers.push(view);}
+        // Stop Spinner
+      }, function(error) {
+        // Stop Spinner
+        A.error(error);
+      });
+    }
+  });
+};
+    $scope.openFilterView = function(){
+      //var modalView = new supersonic.ui.View("example#Settings");
+    var options = {
+      animate: true
+    }
+    $scope.start('example#Settings',true);
+    //supersonic.ui.modal.show($scope.filterView, options);
     }
 
     supersonic.data.channel('filters').subscribe( function(message) {
@@ -181,6 +215,7 @@ angular
             });
         }  
       });
+    $scope.filteredPlaces = $scope.places;
   }
 
   //MAP STUFF
@@ -204,6 +239,116 @@ angular
        
       });
     });
+
+    supersonic.data.channel('radius').subscribe( function(value){
+      $scope.radiusSlider = value;
+    })
+    supersonic.data.channel('filters').subscribe( function(message) {
+      $scope.typesList = message;
+      $scope.types = filterTypes($scope.typesList);
+      $scope.filteredPlaces = [];
+      if($scope.types.length)
+      {
+        $scope.filteredPlaces = filterExistingPlaces($scope.types);
+        if($scope.filteredPlaces.length)
+        {
+        $scope.filteredPlaces = $scope.filteredPlaces.sort(function(a,b){
+                  if (!a.rating){return 1;}
+                  if (!b.rating){return -1;}
+                  return b.rating - a.rating;
+                });
+        $scope.useOriginalArray = false;
+      }
+      }
+      $scope.$apply();
+    });
+
+  var filterExistingPlaces = function(types)
+    {
+      var filteredPlaces = [];
+      loop1:
+       for(var i = 0; i < types.length; i++)
+       { //supersonic.logger.log("i: "  + i);
+          loop2:
+          for(var j = 0; j < $scope.places.length; j++)
+          {
+              //supersonic.logger.log("j: " + j + "Place:" + $scope.places[j].name);
+              var placesTypes = $scope.places[j].types;
+              loop3:
+              for(var k = 0; k < placesTypes.length; k++)
+              {         
+                  if(matchType(types[i], placesTypes[k]))
+                    {
+                      supersonic.logger.log("Type: " + types[i] +  "Place:"  + $scope.places[j].name + "PlaceType: " + placesTypes[k]) ;  
+                      //supersonic.logger.log("k: " + k + "," + "name:" + $scope.places[j].name + "," + placesTypes[k]);
+                      //supersonic.logger.log($scope.places[j].name + "," + types[i] + "," + placesTypes[k]);
+                      filteredPlaces.push($scope.places[j]);
+                      continue loop2;
+                    }
+              }
+          }
+       }
+         return filteredPlaces;
+     }
+
+     var filterTypes = function(list)
+    {
+      var filteredArray = [];
+      angular.forEach(list, function(value, key)
+      {
+          if(value.checked == true)
+            filteredArray.push(value.name);
+      });
+        return filteredArray;
+    }
+
+    var matchType = function(type, placeType)
+    {
+      var returnValue = false;
+        switch(type)
+         { case "Places of worship":
+              if(placeType == "church" || placeType == "hindu_temple"
+                || placeType == "synagogue" || placeType == "place_of_worship" 
+                || placeType == "mosque")
+              {
+                returnValue =  true;
+              }
+              break;
+           case "Museums and Art":
+              if(placeType == "museum" || placeType == "art_gallery")
+              {
+                returnValue = true;         
+              }
+              break;
+             case "Nature":
+              if(placeType == "park" || placeType == "campground"
+                || placeType == "natural_feature")
+              {
+                returnValue =  true;       
+              }
+              break;
+             case "Amusement":
+              if(placeType == "stadium" || placeType == "casino"
+                || placeType == "bowling_alley" || placeType == "amusement_park" )
+              {
+                 returnValue =  true;
+              };
+              break;
+            case "Animals":
+              if(placeType == "zoo" || placeType == "aquarium")
+              {
+                returnValue =  true;
+              };
+              break;
+            case "Library":
+              if(placeType == "library")   
+              {
+                  returnValue =  true;
+              }
+              break;       
+          }
+          return returnValue;
+    }
 
   function compareArrays(Array1, Array2){
 

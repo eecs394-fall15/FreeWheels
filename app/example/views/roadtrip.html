@@ -1,6 +1,9 @@
 <div class="padding" ng-controller="RoadTripController">
 
   <super-navbar>
+  <super-navbar-button ng-click = "openFilterView()">
+    Filters
+  </super-navbar-button>
     <super-navbar-title>
       Road Trip
     </super-navbar-title>
@@ -9,7 +12,7 @@
   <body style="height:100%">
 
   <ul class="list" ng-show="my.newPlaces"><li class="item" style="text-align:center; background-color: #2A1838; color: white">New Places Found</li></ul>
-    <div>
+<!--     <div>
       <h5>Radius for your search:</h5>
             <rzslider
                 rz-slider-floor="0.1"
@@ -18,7 +21,7 @@
                 rz-slider-precision="1"
                 rz-slider-translate="translate"
                 rz-slider-model="radiusSlider"</rzslider>
-    </div>
+    </div> -->
 
     <map center="{{mapCenter}}" zoom="12"></map>
 
