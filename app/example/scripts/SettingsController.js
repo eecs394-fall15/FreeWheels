@@ -52,6 +52,22 @@ angular
      $scope.hideRatingFilter = true;
      $scope.hideSortingFilter = true;
 
+    $scope.SetCurrentType =function(name)
+     {
+        setSelectedType(name);
+        supersonic.data.channel('filters').publish($scope.typesList);
+     }
+
+     var setSelectedType = function(name)
+     {
+        angular.forEach($scope.typesList, function(type)
+        {
+              if(name == type.name)
+              {
+                type.checked = !type.checked;
+              }
+        });
+     }
 
      $scope.SetCurrentItem =function(value)
      {
@@ -71,11 +87,11 @@ angular
         supersonic.data.channel('sorting').publish(value);
      }
 
-   $scope.submitFilters = function()
-   {
-        supersonic.data.channel('filters').publish($scope.typesList);
-        //window.localStorage.setItem("typesList",$scope.typesList);
-      }
+   // $scope.submitFilters = function()
+   // {
+   //      supersonic.data.channel('filters').publish($scope.typesList);
+   //      //window.localStorage.setItem("typesList",$scope.typesList);
+   //    }
 
    $scope.removeView = function(){
    	var options = {

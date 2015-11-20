@@ -91,6 +91,7 @@ angular
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
+      supersonic.logger.log("TYPES:" + $scope.types);
       $scope.filteredPlaces = [];
       if($scope.types.length)
       {
@@ -282,7 +283,7 @@ angular
     supersonic.device.geolocation.getPosition().then( function(position) {
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
-      supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
+      // supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
     });
 
     NgMap.getMap().then(function(map) {
@@ -315,7 +316,7 @@ angular
               {         
                   if(matchType(types[i], placesTypes[k]))
                     {
-                      supersonic.logger.log("Type: " + types[i] +  "Place:"  + $scope.places[j].name + "PlaceType: " + placesTypes[k]) ;  
+                     // supersonic.logger.log("Type: " + types[i] +  "Place:"  + $scope.places[j].name + "PlaceType: " + placesTypes[k]) ;  
                       //supersonic.logger.log("k: " + k + "," + "name:" + $scope.places[j].name + "," + placesTypes[k]);
                       //supersonic.logger.log($scope.places[j].name + "," + types[i] + "," + placesTypes[k]);
                       filteredPlaces.push($scope.places[j]);

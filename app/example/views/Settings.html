@@ -30,10 +30,10 @@
     </div>
 
   <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideTypesFilters()">
-    Select Categories 
+    Select Categories
     <i class="{{categoriesIcon}}"></i>
   </div>
-    <div class = "types" ng-hide = "hideTypesFilter">
+    <!-- <div class = "types" ng-hide = "hideTypesFilter">
       <div class="item item-checkbox" "stylel" ng-repeat="type in typesList">
            <label class="checkbox" >
              <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
@@ -41,7 +41,15 @@
            <i class="icon super-{{type.icon}}"></i>
            {{type.name}}
       </div>
-    </div>
+    </div> -->
+     <div ng-hide="hideTypesFilter">
+    <ul class="list-group" data-toggle="items">
+      <div ng-repeat="type in typesList">
+    <li class="list-group-item active" name="type" ng-model="type.checked" ng-click="SetCurrentType(type.name)">
+      <i class="icon super-{{type.icon}}"></i> {{type.name}}</li>
+  </div>
+    </ul>
+  </div>
 
     
   <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFrequencyFilters()">
@@ -83,5 +91,4 @@
 
   </div>
 
-  </div>
 </div>
