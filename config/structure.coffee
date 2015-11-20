@@ -4,11 +4,11 @@ module.exports =
 
   # See styling options for tabs and other native components in app/common/native-styles/ios.css or app/common/native-styles/android.css
   tabs: [
-    {
-      title: "Nearby Search"
-      id: "nearby"
-      location: "example#nearby" # Supersonic module#view type navigation
-    }
+    #{
+    #  title: "Nearby Search"
+     # id: "nearby"
+    #  location: "example#nearby" # Supersonic module#view type navigation
+    #}
     {
       title: "Road Trip"
       id: "roadtrip"
