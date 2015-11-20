@@ -14,6 +14,7 @@ angular
     $scope.refreshTime = 0.5;
     $scope.minRating = 3;
     $scope.sortBy = 'R';
+    $scope.prevLatLng = "";
     var promise;
 
     $scope.typesList = [
@@ -400,7 +401,12 @@ angular
         //     {return false;}
         // }
         // return true;
-        
+        if($scope.prevLatLng == "")
+        {
+            return false;
+        }
+        else
+        {
         var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
         supersonic.logger.log("DISTANCE in metres:"  + d);
 
@@ -412,6 +418,7 @@ angular
         {
           return true;
         }
+      }
 
   }
 
