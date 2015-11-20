@@ -4,10 +4,14 @@ angular
   	$scope.radiusSlider = 2.0;
     var toggleCategoryIcon = 0;
     var toggleFrequencyIcon = 0;
+    var toggleRatingIcon = 0;
     $scope.categoriesIcon = "super-chevron-down";
      $scope.FrequencyIcon = "super-chevron-down";
+     $scope.RatingIcon = "super-chevron-down";
      $scope.selectedFrequency = {
       value: 0.5};
+      $scope.selectedRating = {
+      value: 4};
   	 $scope.typesList = [
                   {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
@@ -25,8 +29,17 @@ angular
                   {'name':'Every 3 hours','value': 180},
                   {'name':'Every 4 hours', 'value': 240},
                   {'name':'Every 5 hours', 'value': 300}];
+
+       $scope.RatingList = [
+                  {'name':'4 Stars & Up', 'value': 4},
+                  {'name':'3 Stars & Up','value': 3},
+                  {'name':'2 Stars & up','value': 2},
+                  {'name':'1 Star & up','value': 1}, 
+                  {'name':'None','value': 0}];
+
      $scope.hideTypesFilter = true;
      $scope.hideFrequencyFilter = true;
+     $scope.hideRatingFilter = true;
 
 
      $scope.SetCurrentItem =function(value)
@@ -34,6 +47,13 @@ angular
         $scope.selectedFrequency.value = value;
         supersonic.data.channel('refreshTime').publish(value);
      }
+
+     $scope.SetCurrentRating =function(value)
+     {
+        $scope.selectedRating.value = value;
+        supersonic.data.channel('rating').publish(value);
+     }
+
    $scope.submitFilters = function()
    {
         supersonic.data.channel('filters').publish($scope.typesList);
@@ -70,6 +90,18 @@ angular
     else{
       $scope.FrequencyIcon = "super-chevron-down";
       toggleFrequencyIcon = 0;
+    }
+   }
+
+   $scope.hideRatingFilters = function(){
+    $scope.hideRatingFilter = !$scope.hideRatingFilter;
+    if (toggleRatingIcon == 0){
+      $scope.RatingIcon = "super-chevron-up";
+      toggleRatingIcon = 1;
+    }
+    else{
+      $scope.RatingIcon = "super-chevron-down";
+      toggleRatingIcon = 0;
     }
    }
 

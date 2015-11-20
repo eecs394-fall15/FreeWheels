@@ -44,7 +44,7 @@
     </div>
 
     
-     <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFrequencyFilters()">
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFrequencyFilters()">
     Auto-update new places
     <i class="{{FrequencyIcon}}"></i>
   </div>
@@ -55,6 +55,20 @@
   </div>
     </ul>
   </div>
+
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideRatingFilters()">
+    Show me places rated
+    <i class="{{RatingIcon}}"></i>
+  </div>
+    <div ng-hide="hideRatingFilter">
+    <ul class="list-group">
+      <div ng-repeat="type in RatingList">
+    <li class="list-group-item" name="rating" ng-model="selectedRating.value" ng-click="SetCurrentRating(type.value)">{{type.name}}</li>
+  </div>
+    </ul>
+  </div>
+
+
   </div>
 
   </div>

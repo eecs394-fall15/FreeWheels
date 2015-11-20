@@ -12,6 +12,7 @@ angular
     $scope.filteredPlaces = [];
     $scope.latlng = new google.maps.LatLng(42.0563195,-87.6969445);
     $scope.refreshTime = 0.5;
+    $scope.minRating = 3;
     var promise;
 
     $scope.typesList = [
@@ -28,9 +29,10 @@ angular
     }
 
     var refreshPlaces = function() {
+      supersonic.logger.log("REFRESH CALLED");
       $scope.previousPlaces = $scope.places.slice();
      findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
-      supersonic.logger.log(angular.toJson($scope.visibleplaces));
+      //supersonic.logger.log(angular.toJson($scope.visibleplaces));
       if (!compareArrays(arr1, arr2)){
         newPlacesNearby();
       }
@@ -41,11 +43,14 @@ angular
 
     var newPlacesNearby = function()
     {
+      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      if($scope.places.length)
       $scope.my.newPlaces = true;
     }
 
     $scope.pushNewPlaces = function() {
-      $scope.visibleplaces = $scope.places;
+      //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      $scope.visibleplaces = angular.copy($scope.places);
       $scope.my.newPlaces = false;
     }
 
@@ -106,8 +111,12 @@ angular
       $scope.radiusSlider = value;
     });
 
+     supersonic.data.channel('rating').subscribe( function(value){
+      $scope.minRating = value;
+    });
+
       supersonic.data.channel('refreshTime').subscribe( function(value){
-      supersonic.logger.log("REFRESHTIME:" + value);
+      //supersonic.logger.log("REFRESHTIME:" + value + "," + "MINRATING:" + $scope.minRating);
       $interval.cancel(promise);
       $scope.refreshTime = value;
       if($scope.refreshTime != 0)
@@ -219,9 +228,11 @@ angular
                 if(details != null && details.photos != undefined && details.photos != null)
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
-                 supersonic.logger.log(photo);
+                 //supersonic.logger.log(photo);
                  var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
-                $scope.places.push({
+                 if((result.rating >= $scope.minRating) || (result.rating == null && $scope.minRating == 0))
+                {
+                  $scope.places.push({
                     name: result.name,
                     icon: result.icon,
                     vicinity: result.vicinity,
@@ -232,6 +243,7 @@ angular
                     types: result.types,
                     navstr: navstring
                   });
+                }
                 // supersonic.logger.log("162:" + $scope.places.length);
                 $scope.places = $scope.places.sort(function(a,b){
                   if (!a.rating){return 1;}
@@ -260,7 +272,10 @@ angular
     NgMap.getMap().then(function(map) {
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
+       $scope.prevLatLng = angular.copy($scope.latlng);
        $scope.latlng = e.latLng;
+       //supersonic.logger.log("PREV LATLONG:" + $scope.prevLatLng.lat());
+       //supersonic.logger.log("NEW LATLONG:" + $scope.latlng.lat());
        if($scope.refreshTime == 0)
           refreshPlaces();
       });
@@ -356,18 +371,31 @@ angular
     }
 
   function compareArrays(Array1, Array2){
+       // supersonic.logger.log("Compare Called:" + Array1.length + "," +  Array2.length);
+        // for (i = 0; i < Array2.length; i++){
+        //   var foundName = false;
+        //   for (j = 0; j < Array1.length; j++){
+        //     if (Array1[j].name == Array2[i].name){
+        //       foundName = true;
+        //     }
+        //   }
+        //   if (!foundName)
+        //     {return false;}
+        // }
+        // return true;
+        
+        var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
+        supersonic.logger.log("DISTANCE in metres:"  + d);
 
-        for (i = 0; i < Array2.length; i++){
-          var foundName = false;
-          for (j = 0; j < Array1.length; j++){
-            if (Array1[j].name == Array2[i].name){
-              foundName = true;
-            }
-          }
-          if (!foundName)
-            {return false;}
+        if(d >= 2000)
+        {
+          return false;
         }
-        return true;
+        else
+        {
+          return true;
+        }
+
   }
 
   function placeMarkerAndPanTo(latLng, map) {
