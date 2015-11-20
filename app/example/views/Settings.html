@@ -12,10 +12,10 @@
 
   </super-navbar>
   
-  <body style="height:100%">
-
+  <!-- <body style="height:100%"> -->
 
 <div class="list" >
+
     <div class="item item-divider" style="font-weight:bold;font-size:125%">
       Search Radius
     </div>
@@ -29,11 +29,11 @@
                 rz-slider-model="radiusSlider"</rzslider>
     </div>
 
-  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFilters()">
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideTypesFilters()">
     Select Categories 
     <i class="{{categoriesIcon}}"></i>
   </div>
-    <div class = "types" ng-hide = "hideFilter">
+    <div class = "types" ng-hide = "hideTypesFilter">
       <div class="item item-checkbox" "stylel" ng-repeat="type in typesList">
            <label class="checkbox" >
              <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
@@ -42,5 +42,20 @@
            {{type.name}}
       </div>
     </div>
+
+    
+     <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFrequencyFilters()">
+    Auto-update new places
+    <i class="{{FrequencyIcon}}"></i>
+  </div>
+    <div ng-hide="hideFrequencyFilter">
+    <ul class="list-group">
+      <div ng-repeat="type in FrequencyList">
+    <li class="list-group-item" name="frequency" ng-model="selectedFrequency.value" ng-click="SetCurrentItem(type.value)">{{type.name}}</li>
+  </div>
+    </ul>
+  </div>
+  </div>
+
   </div>
 </div>

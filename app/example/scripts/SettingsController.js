@@ -2,8 +2,12 @@ angular
   .module('example')
   .controller('SettingsController', function($scope, supersonic){
   	$scope.radiusSlider = 2.0;
-    var toggleIcon = 0;
+    var toggleCategoryIcon = 0;
+    var toggleFrequencyIcon = 0;
     $scope.categoriesIcon = "super-chevron-down";
+     $scope.FrequencyIcon = "super-chevron-down";
+     $scope.selectedFrequency = {
+      value: 0.5};
   	 $scope.typesList = [
                   {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
@@ -11,9 +15,25 @@ angular
                   {'name':'Museums and Art','checked': true, 'icon':'ios-flask-outline'},
                   {'name':'Nature','checked': true, 'icon':'leaf'},
                   {'name':'Places of worship','checked': true, 'icon':'ios-moon-outline'}];
-     $scope.hideFilter = true;
+
+      $scope.FrequencyList = [
+                  {'name':'Default', 'value': 0.5},
+                  {'name':'Never','value': 0},
+                  {'name':'Every 30 minutes','value': 30},
+                  {'name':'Every 1 hour','value': 60}, 
+                  {'name':'Every 2 hours','value': 120},
+                  {'name':'Every 3 hours','value': 180},
+                  {'name':'Every 4 hours', 'value': 240},
+                  {'name':'Every 5 hours', 'value': 300}];
+     $scope.hideTypesFilter = true;
+     $scope.hideFrequencyFilter = true;
 
 
+     $scope.SetCurrentItem =function(value)
+     {
+        $scope.selectedFrequency.value = value;
+        supersonic.data.channel('refreshTime').publish(value);
+     }
    $scope.submitFilters = function()
    {
         supersonic.data.channel('filters').publish($scope.typesList);
@@ -29,15 +49,27 @@ angular
 
    }
 
-   $scope.hideFilters = function(){
-   	$scope.hideFilter = !$scope.hideFilter;
-    if (toggleIcon == 0){
+   $scope.hideTypesFilters = function(){
+   	$scope.hideTypesFilter = !$scope.hideTypesFilter;
+    if (toggleCategoryIcon == 0){
       $scope.categoriesIcon = "super-chevron-up";
-      toggleIcon = 1;
+      toggleCategoryIcon = 1;
     }
     else{
       $scope.categoriesIcon = "super-chevron-down";
-      toggleIcon = 0;
+      toggleCategoryIcon = 0;
+    }
+   }
+
+   $scope.hideFrequencyFilters = function(){
+    $scope.hideFrequencyFilter = !$scope.hideFrequencyFilter;
+    if (toggleFrequencyIcon == 0){
+      $scope.FrequencyIcon = "super-chevron-up";
+      toggleFrequencyIcon = 1;
+    }
+    else{
+      $scope.FrequencyIcon = "super-chevron-down";
+      toggleFrequencyIcon = 0;
     }
    }
 

@@ -7,6 +7,8 @@
     "supersonic": "1.x",
     "angularjs-google-places": "0.1.0",
     "angularjs-slider": "1.x",
-    "ngmap":"1.x"
+    "ngmap":"1.x",
+    "jquery": "3.x",
+    "bootstrap": "3.x"
   }
 }

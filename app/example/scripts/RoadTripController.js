@@ -11,6 +11,8 @@ angular
     $scope.types = [];
     $scope.filteredPlaces = [];
     $scope.latlng = new google.maps.LatLng(42.0563195,-87.6969445);
+    $scope.refreshTime = 0.5;
+    var promise;
 
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
@@ -35,7 +37,7 @@ angular
      });
     }
 
-    $interval(refreshPlaces, 30000);
+    promise = $interval(refreshPlaces, $scope.refreshTime * 60000);
 
     var newPlacesNearby = function()
     {
@@ -79,14 +81,37 @@ angular
     //supersonic.ui.modal.show($scope.filterView, options);
     }
 
+
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
-      supersonic.logger.log($scope.types);
-      $scope.filteredPlaces = filterExistingPlaces($scope.types);
-      supersonic.logger.log($scope.places);
-      supersonic.logger.log($scope.filteredPlaces);
-      $scope.useOriginalArray = false;
+      $scope.filteredPlaces = [];
+      if($scope.types.length)
+      {
+        $scope.filteredPlaces = filterExistingPlaces($scope.types);
+        if($scope.filteredPlaces.length)
+        {
+        $scope.filteredPlaces = $scope.filteredPlaces.sort(function(a,b){
+                  if (!a.rating){return 1;}
+                  if (!b.rating){return -1;}
+                  return b.rating - a.rating;
+                });
+        $scope.useOriginalArray = false;
+      }
+      }
+      $scope.$apply();
+    });
+
+     supersonic.data.channel('radius').subscribe( function(value){
+      $scope.radiusSlider = value;
+    });
+
+      supersonic.data.channel('refreshTime').subscribe( function(value){
+      supersonic.logger.log("REFRESHTIME:" + value);
+      $interval.cancel(promise);
+      $scope.refreshTime = value;
+      if($scope.refreshTime != 0)
+      promise =  $interval(refreshPlaces, $scope.refreshTime * 60000);
     });
 
     var filterExistingPlaces = function(types)
@@ -236,32 +261,12 @@ angular
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
        $scope.latlng = e.latLng;
-       // refreshPlaces();
+       if($scope.refreshTime == 0)
+          refreshPlaces();
       });
     });
 
-    supersonic.data.channel('radius').subscribe( function(value){
-      $scope.radiusSlider = value;
-    })
-    supersonic.data.channel('filters').subscribe( function(message) {
-      $scope.typesList = message;
-      $scope.types = filterTypes($scope.typesList);
-      $scope.filteredPlaces = [];
-      if($scope.types.length)
-      {
-        $scope.filteredPlaces = filterExistingPlaces($scope.types);
-        if($scope.filteredPlaces.length)
-        {
-        $scope.filteredPlaces = $scope.filteredPlaces.sort(function(a,b){
-                  if (!a.rating){return 1;}
-                  if (!b.rating){return -1;}
-                  return b.rating - a.rating;
-                });
-        $scope.useOriginalArray = false;
-      }
-      }
-      $scope.$apply();
-    });
+   
 
   var filterExistingPlaces = function(types)
     {
