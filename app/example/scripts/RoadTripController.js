@@ -13,6 +13,7 @@ angular
     $scope.latlng = new google.maps.LatLng(42.0563195,-87.6969445);
     $scope.refreshTime = 0.5;
     $scope.minRating = 3;
+    $scope.sortBy = 'R';
     var promise;
 
     $scope.typesList = [
@@ -113,6 +114,9 @@ angular
 
      supersonic.data.channel('rating').subscribe( function(value){
       $scope.minRating = value;
+    });
+      supersonic.data.channel('sorting').subscribe( function(value){
+      $scope.sortBy = value;
     });
 
       supersonic.data.channel('refreshTime').subscribe( function(value){
@@ -230,6 +234,7 @@ angular
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
                  //supersonic.logger.log(photo);
                  var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
+                 var distance = google.maps.geometry.spherical.computeDistanceBetween($scope.latlng, result.geometry.location) * 0.000621371;
                  if((result.rating >= $scope.minRating) || (result.rating == null && $scope.minRating == 0))
                 {
                   $scope.places.push({
@@ -241,15 +246,26 @@ angular
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
-                    navstr: navstring
+                    navstr: navstring,
+                    distance: distance
                   });
                 }
                 // supersonic.logger.log("162:" + $scope.places.length);
-                $scope.places = $scope.places.sort(function(a,b){
-                  if (!a.rating){return 1;}
-                  if (!b.rating){return -1;}
-                  return b.rating - a.rating;
-                });
+                if($scope.sortBy == 'R')
+                {
+                    $scope.places = $scope.places.sort(function(a,b){
+                      if (!a.rating){return 1;}
+                      if (!b.rating){return -1;}
+                      return b.rating - a.rating;
+                    });
+                }
+                else if($scope.sortBy == 'D')
+                {
+                    $scope.places = $scope.places.sort(function(a,b){
+                      return a.distance - b.distance;
+                    });
+
+                }
                  // supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                 callback($scope.previousPlaces, $scope.places); 
                 $scope.$apply();

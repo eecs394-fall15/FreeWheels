@@ -5,13 +5,19 @@ angular
     var toggleCategoryIcon = 0;
     var toggleFrequencyIcon = 0;
     var toggleRatingIcon = 0;
+    var toggleSortingIcon = 0;
     $scope.categoriesIcon = "super-chevron-down";
      $scope.FrequencyIcon = "super-chevron-down";
      $scope.RatingIcon = "super-chevron-down";
+     $scope.SortingIcon = "super-chevron-down";
+
      $scope.selectedFrequency = {
       value: 0.5};
       $scope.selectedRating = {
       value: 4};
+       $scope.selectedSorting = {
+      value: 'R'};
+
   	 $scope.typesList = [
                   {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
@@ -37,9 +43,14 @@ angular
                   {'name':'1 Star & up','value': 1}, 
                   {'name':'None','value': 0}];
 
+      $scope.SortingList = [
+                  {'name':'Distance', 'value': 'D'},
+                  {'name':'Rating','value': 'R'}];
+
      $scope.hideTypesFilter = true;
      $scope.hideFrequencyFilter = true;
      $scope.hideRatingFilter = true;
+     $scope.hideSortingFilter = true;
 
 
      $scope.SetCurrentItem =function(value)
@@ -52,6 +63,12 @@ angular
      {
         $scope.selectedRating.value = value;
         supersonic.data.channel('rating').publish(value);
+     }
+
+     $scope.SetCurrentSorting =function(value)
+     {
+        $scope.selectedSorting.value = value;
+        supersonic.data.channel('sorting').publish(value);
      }
 
    $scope.submitFilters = function()
@@ -105,6 +122,17 @@ angular
     }
    }
 
+   $scope.hideSortingFilters = function(){
+    $scope.hideSortingFilter = !$scope.hideSortingFilter;
+    if (toggleSortingIcon == 0){
+      $scope.SortingIcon = "super-chevron-up";
+      toggleSortingIcon = 1;
+    }
+    else{
+      $scope.SortingIcon = "super-chevron-down";
+      toggleSortingIcon = 0;
+    }
+   }
    $scope.translate = function(value){
    	return value + "mi";
    }

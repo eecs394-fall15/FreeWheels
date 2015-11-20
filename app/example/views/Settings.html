@@ -68,6 +68,18 @@
     </ul>
   </div>
 
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideSortingFilters()">
+    Sort places by
+    <i class="{{SortingIcon}}"></i>
+  </div>
+    <div ng-hide="hideSortingFilter">
+    <ul class="list-group">
+      <div ng-repeat="type in SortingList">
+    <li class="list-group-item" name="sorting" ng-model="selectedSorting.value" ng-click="SetCurrentSorting(type.value)">{{type.name}}</li>
+  </div>
+    </ul>
+  </div>
+
 
   </div>
 
