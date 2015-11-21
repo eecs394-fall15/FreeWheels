@@ -10,12 +10,13 @@ angular
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = [];
     $scope.filteredPlaces = [];
-    $scope.latlng = new google.maps.LatLng(42.0563195,-87.6969445);
+    $scope.latlng = "";
     $scope.refreshTime = 0.5;
     $scope.minRating = 3;
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
     var promise;
+
 
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
@@ -29,6 +30,13 @@ angular
     {
         return value + ' mi';
     }
+
+      //MAP STUFF
+     $scope.marker = null;
+    supersonic.device.geolocation.getPosition().then( function(position) {
+      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      $scope.latlng = myLocation;
+      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
 
     var refreshPlaces = function() {
       supersonic.logger.log("REFRESH CALLED");
@@ -276,18 +284,12 @@ angular
             });
         }  
       });
-    $scope.filteredPlaces = $scope.places;
+      $scope.filteredPlaces = $scope.places;
   }
-
-  //MAP STUFF
-  $scope.marker = null;
-    supersonic.device.geolocation.getPosition().then( function(position) {
-      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
-      // supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
-    });
+    
 
     NgMap.getMap().then(function(map) {
+      placeMarkerAndPanTo($scope.latlng, map);
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
        $scope.prevLatLng = angular.copy($scope.latlng);
@@ -403,22 +405,23 @@ angular
         // return true;
         if($scope.prevLatLng == "")
         {
+          supersonic.logger.log("1st time");
             return false;
         }
         else
         {
-        var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
-        supersonic.logger.log("DISTANCE in metres:"  + d);
+          var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
+         supersonic.logger.log("DISTANCE in metres:"  + d);
 
-        if(d >= 2000)
-        {
-          return false;
-        }
-        else
-        {
-          return true;
-        }
-      }
+         if(d >= 2000)
+          {
+            return false;
+          }
+         else
+         {
+            return true;
+         }
+       }
 
   }
 
@@ -433,4 +436,6 @@ angular
     $scope.marker = marker;
     map.panTo(latLng);
   }
+
+});
 });
