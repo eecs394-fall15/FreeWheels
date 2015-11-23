@@ -27,14 +27,12 @@ angular
                   {'name':'Places of worship','checked': true, 'icon':'ios-moon-outline'}];
 
       $scope.FrequencyList = [
-                  {'name':'Default', 'value': 0.5},
-                  {'name':'Never','value': 0},
+                  {'name':'Manual', 'value': 100},
+                  {'name':'Every 10 seconds (Default)','value': 1/6},
+                  {'name':'Every 5 minutes','value': 5}, 
+                  {'name':'Every 10 minutes','value': 10},
                   {'name':'Every 30 minutes','value': 30},
-                  {'name':'Every 1 hour','value': 60}, 
-                  {'name':'Every 2 hours','value': 120},
-                  {'name':'Every 3 hours','value': 180},
-                  {'name':'Every 4 hours', 'value': 240},
-                  {'name':'Every 5 hours', 'value': 300}];
+                  {'name':'Every hour', 'value': 60}];
 
        $scope.RatingList = [
                   {'name':'4 Stars & Up', 'value': 4},

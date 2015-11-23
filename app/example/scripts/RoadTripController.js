@@ -16,6 +16,7 @@ angular
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
     var promise;
+    supersonic.ui.tabs.hide();
 
 
     $scope.typesList = [
@@ -31,12 +32,15 @@ angular
         return value + ' mi';
     }
 
+
+
       //MAP STUFF
      $scope.marker = null;
     supersonic.device.geolocation.getPosition().then( function(position) {
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       $scope.latlng = myLocation;
       $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
+
 
     var refreshPlaces = function() {
       supersonic.logger.log("REFRESH CALLED");
@@ -49,7 +53,25 @@ angular
      });
     }
 
+    $scope.startPlaces = function() {
+     supersonic.logger.log("lat long start: " + $scope.latlng);
+      // $scope.previousPlaces = $scope.places.slice();
+     findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
+      $scope.pushNewPlaces();
+      //supersonic.logger.log(angular.toJson($scope.visibleplaces));
+     });
+    }
+
+    
+
     promise = $interval(refreshPlaces, $scope.refreshTime * 60000);
+
+    $scope.manualRefresh = function()
+    {
+      supersonic.logger.log("In manual refresh function");
+      $interval.cancel(promise);
+      refreshPlaces();
+    }
 
     var newPlacesNearby = function()
     {
@@ -59,7 +81,7 @@ angular
     }
 
     $scope.pushNewPlaces = function() {
-      //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
       $scope.visibleplaces = angular.copy($scope.places);
       $scope.my.newPlaces = false;
     }
@@ -170,6 +192,7 @@ angular
 
    var findMeAwesomePlaces = function(myLocation, callback)
    {
+      supersonic.logger.log(myLocation);
       $scope.useOriginalArray = true;
       $scope.places = [];
       $scope.filteredPlaces = [];
@@ -276,7 +299,7 @@ angular
                     });
 
                 }
-                 // supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
+                 supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                 callback($scope.previousPlaces, $scope.places); 
                 $scope.$apply();
               }
@@ -290,6 +313,8 @@ angular
 
     NgMap.getMap().then(function(map) {
       placeMarkerAndPanTo($scope.latlng, map);
+
+      $timeout($scope.startPlaces, 500);
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
        $scope.prevLatLng = angular.copy($scope.latlng);

@@ -16,12 +16,6 @@
   "tabs": [
     {
       "position": 0,
-      "id": "nearby",
-      "title": "Nearby Search",
-      "target_url": "http://localhost/app/example/nearby.html"
-    },
-    {
-      "position": 1,
       "id": "roadtrip",
       "title": "Road Trip",
       "target_url": "http://localhost/app/example/roadtrip.html"
