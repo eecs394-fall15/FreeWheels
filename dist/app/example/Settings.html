@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/app/common/stylesheets/application.css" />
   <link rel="import" href="/components/supersonic/components/import.html">
   <link rel="stylesheet" href="/components/angularjs-slider/dist/rzslider.min.css">
+  <link rel="stylesheet" href="/components/bootstrap/dist/css/bootstrap.min.css">
 
   <script src="http://localhost/cordova.js"></script>
   <script src="/components/steroids-js/steroids.js"></script>
@@ -29,9 +30,12 @@
    <script
    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTTZ2uS-sHoJFyjJ0xTUI3MEouGdTAf8Y">
    </script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTTZ2uS-sHoJFyjJ0xTUI3MEouGdTAf8Y&libraries=places"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTTZ2uS-sHoJFyjJ0xTUI3MEouGdTAf8Y&libraries=places,geometry"></script>
     <!--<script src="http://maps.google.com/maps/api/js"></script>-->
     <script src="/components/ngmap/build/scripts/ng-map.min.js"></script>
+    <script src="/components/jquery/dist/jquery.min.js"></script>
+    <script src="/components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap.listgroup/1.1.2/listgroup.min.js"></script>
   
   <script src="/app/common.js"></script>
   
@@ -54,10 +58,10 @@
 
   </super-navbar>
   
-  <body style="height:100%">
-
+  <!-- <body style="height:100%"> -->
 
 <div class="list" >
+
     <div class="item item-divider" style="font-weight:bold;font-size:125%">
       Search Radius
     </div>
@@ -71,11 +75,11 @@
                 rz-slider-model="radiusSlider"</rzslider>
     </div>
 
-  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFilters()">
-    Select Categories 
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideTypesFilters()">
+    Select Categories
     <i class="{{categoriesIcon}}"></i>
   </div>
-    <div class = "types" ng-hide = "hideFilter">
+    <!-- <div class = "types" ng-hide = "hideTypesFilter">
       <div class="item item-checkbox" "stylel" ng-repeat="type in typesList">
            <label class="checkbox" >
              <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
@@ -83,8 +87,56 @@
            <i class="icon super-{{type.icon}}"></i>
            {{type.name}}
       </div>
-    </div>
+    </div> -->
+     <div ng-hide="hideTypesFilter">
+    <ul class="list-group" data-toggle="items">
+      <div ng-repeat="type in typesList">
+    <li class="list-group-item active" name="type" ng-model="type.checked" ng-click="SetCurrentType(type.name)">
+      <i class="icon super-{{type.icon}}"></i> {{type.name}}</li>
   </div>
+    </ul>
+  </div>
+
+    
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideFrequencyFilters()">
+    Auto-update new places
+    <i class="{{FrequencyIcon}}"></i>
+  </div>
+    <div ng-hide="hideFrequencyFilter">
+    <ul class="list-group">
+      <div ng-repeat="type in FrequencyList">
+    <li class="list-group-item" name="frequency" ng-model="selectedFrequency.value" ng-click="SetCurrentItem(type.value)">{{type.name}}</li>
+  </div>
+    </ul>
+  </div>
+
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideRatingFilters()">
+    Show me places rated
+    <i class="{{RatingIcon}}"></i>
+  </div>
+    <div ng-hide="hideRatingFilter">
+    <ul class="list-group">
+      <div ng-repeat="type in RatingList">
+    <li class="list-group-item" name="rating" ng-model="selectedRating.value" ng-click="SetCurrentRating(type.value)">{{type.name}}</li>
+  </div>
+    </ul>
+  </div>
+
+  <div class="item item-divider item-icon-right" style="font-weight:bold;font-size:125%" ng-click = "hideSortingFilters()">
+    Sort places by
+    <i class="{{SortingIcon}}"></i>
+  </div>
+    <div ng-hide="hideSortingFilter">
+    <ul class="list-group">
+      <div ng-repeat="type in SortingList">
+    <li class="list-group-item" name="sorting" ng-model="selectedSorting.value" ng-click="SetCurrentSorting(type.value)">{{type.name}}</li>
+  </div>
+    </ul>
+  </div>
+
+
+  </div>
+
 </div>
 
 

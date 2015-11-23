@@ -31,6 +31,8 @@ angular
         return value + ' mi';
     }
 
+    
+
       //MAP STUFF
      $scope.marker = null;
     supersonic.device.geolocation.getPosition().then( function(position) {
@@ -50,6 +52,13 @@ angular
     }
 
     promise = $interval(refreshPlaces, $scope.refreshTime * 60000);
+
+    $scope.manualRefresh = function()
+    {
+      supersonic.logger.log("In manual refresh function");
+      //$interval.cancel(promise);
+      refreshPlaces();
+    }
 
     var newPlacesNearby = function()
     {

@@ -360,7 +360,13 @@ angular
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = [];
     $scope.filteredPlaces = [];
-    $scope.latlng = new google.maps.LatLng(42.0563195,-87.6969445);
+    $scope.latlng = "";
+    $scope.refreshTime = 0.5;
+    $scope.minRating = 3;
+    $scope.sortBy = 'R';
+    $scope.prevLatLng = "";
+    var promise;
+
 
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
@@ -375,25 +381,45 @@ angular
         return value + ' mi';
     }
 
+    
+
+      //MAP STUFF
+     $scope.marker = null;
+    supersonic.device.geolocation.getPosition().then( function(position) {
+      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      $scope.latlng = myLocation;
+      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
+
     var refreshPlaces = function() {
+      supersonic.logger.log("REFRESH CALLED");
       $scope.previousPlaces = $scope.places.slice();
      findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
-      supersonic.logger.log(angular.toJson($scope.visibleplaces));
+      //supersonic.logger.log(angular.toJson($scope.visibleplaces));
       if (!compareArrays(arr1, arr2)){
         newPlacesNearby();
       }
      });
     }
 
-    $interval(refreshPlaces, 30000);
+    promise = $interval(refreshPlaces, $scope.refreshTime * 60000);
+
+    $scope.manualRefresh = function()
+    {
+      supersonic.logger.log("In manual refresh function");
+      //$interval.cancel(promise);
+      refreshPlaces();
+    }
 
     var newPlacesNearby = function()
     {
+      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      if($scope.places.length)
       $scope.my.newPlaces = true;
     }
 
     $scope.pushNewPlaces = function() {
-      $scope.visibleplaces = $scope.places;
+      //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      $scope.visibleplaces = angular.copy($scope.places);
       $scope.my.newPlaces = false;
     }
 
@@ -429,14 +455,45 @@ angular
     //supersonic.ui.modal.show($scope.filterView, options);
     }
 
+
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
-      supersonic.logger.log($scope.types);
-      $scope.filteredPlaces = filterExistingPlaces($scope.types);
-      supersonic.logger.log($scope.places);
-      supersonic.logger.log($scope.filteredPlaces);
-      $scope.useOriginalArray = false;
+      supersonic.logger.log("TYPES:" + $scope.types);
+      $scope.filteredPlaces = [];
+      if($scope.types.length)
+      {
+        $scope.filteredPlaces = filterExistingPlaces($scope.types);
+        if($scope.filteredPlaces.length)
+        {
+        $scope.filteredPlaces = $scope.filteredPlaces.sort(function(a,b){
+                  if (!a.rating){return 1;}
+                  if (!b.rating){return -1;}
+                  return b.rating - a.rating;
+                });
+        $scope.useOriginalArray = false;
+      }
+      }
+      $scope.$apply();
+    });
+
+     supersonic.data.channel('radius').subscribe( function(value){
+      $scope.radiusSlider = value;
+    });
+
+     supersonic.data.channel('rating').subscribe( function(value){
+      $scope.minRating = value;
+    });
+      supersonic.data.channel('sorting').subscribe( function(value){
+      $scope.sortBy = value;
+    });
+
+      supersonic.data.channel('refreshTime').subscribe( function(value){
+      //supersonic.logger.log("REFRESHTIME:" + value + "," + "MINRATING:" + $scope.minRating);
+      $interval.cancel(promise);
+      $scope.refreshTime = value;
+      if($scope.refreshTime != 0)
+      promise =  $interval(refreshPlaces, $scope.refreshTime * 60000);
     });
 
     var filterExistingPlaces = function(types)
@@ -544,9 +601,12 @@ angular
                 if(details != null && details.photos != undefined && details.photos != null)
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
-                 supersonic.logger.log(photo);
+                 //supersonic.logger.log(photo);
                  var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
-                $scope.places.push({
+                 var distance = google.maps.geometry.spherical.computeDistanceBetween($scope.latlng, result.geometry.location) * 0.000621371;
+                 if((result.rating >= $scope.minRating) || (result.rating == null && $scope.minRating == 0))
+                {
+                  $scope.places.push({
                     name: result.name,
                     icon: result.icon,
                     vicinity: result.vicinity,
@@ -555,14 +615,26 @@ angular
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
-                    navstr: navstring
+                    navstr: navstring,
+                    distance: distance
                   });
+                }
                 // supersonic.logger.log("162:" + $scope.places.length);
-                $scope.places = $scope.places.sort(function(a,b){
-                  if (!a.rating){return 1;}
-                  if (!b.rating){return -1;}
-                  return b.rating - a.rating;
-                });
+                if($scope.sortBy == 'R')
+                {
+                    $scope.places = $scope.places.sort(function(a,b){
+                      if (!a.rating){return 1;}
+                      if (!b.rating){return -1;}
+                      return b.rating - a.rating;
+                    });
+                }
+                else if($scope.sortBy == 'D')
+                {
+                    $scope.places = $scope.places.sort(function(a,b){
+                      return a.distance - b.distance;
+                    });
+
+                }
                  // supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                 callback($scope.previousPlaces, $scope.places); 
                 $scope.$apply();
@@ -571,47 +643,24 @@ angular
             });
         }  
       });
-    $scope.filteredPlaces = $scope.places;
+      $scope.filteredPlaces = $scope.places;
   }
-
-  //MAP STUFF
-  $scope.marker = null;
-    supersonic.device.geolocation.getPosition().then( function(position) {
-      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
-      supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
-    });
+    
 
     NgMap.getMap().then(function(map) {
+      placeMarkerAndPanTo($scope.latlng, map);
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
+       $scope.prevLatLng = angular.copy($scope.latlng);
        $scope.latlng = e.latLng;
-       // refreshPlaces();
+       //supersonic.logger.log("PREV LATLONG:" + $scope.prevLatLng.lat());
+       //supersonic.logger.log("NEW LATLONG:" + $scope.latlng.lat());
+       if($scope.refreshTime == 0)
+          refreshPlaces();
       });
     });
 
-    supersonic.data.channel('radius').subscribe( function(value){
-      $scope.radiusSlider = value;
-    })
-    supersonic.data.channel('filters').subscribe( function(message) {
-      $scope.typesList = message;
-      $scope.types = filterTypes($scope.typesList);
-      $scope.filteredPlaces = [];
-      if($scope.types.length)
-      {
-        $scope.filteredPlaces = filterExistingPlaces($scope.types);
-        if($scope.filteredPlaces.length)
-        {
-        $scope.filteredPlaces = $scope.filteredPlaces.sort(function(a,b){
-                  if (!a.rating){return 1;}
-                  if (!b.rating){return -1;}
-                  return b.rating - a.rating;
-                });
-        $scope.useOriginalArray = false;
-      }
-      }
-      $scope.$apply();
-    });
+   
 
   var filterExistingPlaces = function(types)
     {
@@ -629,7 +678,7 @@ angular
               {         
                   if(matchType(types[i], placesTypes[k]))
                     {
-                      supersonic.logger.log("Type: " + types[i] +  "Place:"  + $scope.places[j].name + "PlaceType: " + placesTypes[k]) ;  
+                     // supersonic.logger.log("Type: " + types[i] +  "Place:"  + $scope.places[j].name + "PlaceType: " + placesTypes[k]) ;  
                       //supersonic.logger.log("k: " + k + "," + "name:" + $scope.places[j].name + "," + placesTypes[k]);
                       //supersonic.logger.log($scope.places[j].name + "," + types[i] + "," + placesTypes[k]);
                       filteredPlaces.push($scope.places[j]);
@@ -701,18 +750,38 @@ angular
     }
 
   function compareArrays(Array1, Array2){
-
-        for (i = 0; i < Array2.length; i++){
-          var foundName = false;
-          for (j = 0; j < Array1.length; j++){
-            if (Array1[j].name == Array2[i].name){
-              foundName = true;
-            }
-          }
-          if (!foundName)
-            {return false;}
+       // supersonic.logger.log("Compare Called:" + Array1.length + "," +  Array2.length);
+        // for (i = 0; i < Array2.length; i++){
+        //   var foundName = false;
+        //   for (j = 0; j < Array1.length; j++){
+        //     if (Array1[j].name == Array2[i].name){
+        //       foundName = true;
+        //     }
+        //   }
+        //   if (!foundName)
+        //     {return false;}
+        // }
+        // return true;
+        if($scope.prevLatLng == "")
+        {
+          supersonic.logger.log("1st time");
+            return false;
         }
-        return true;
+        else
+        {
+          var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
+         supersonic.logger.log("DISTANCE in metres:"  + d);
+
+         if(d >= 2000)
+          {
+            return false;
+          }
+         else
+         {
+            return true;
+         }
+       }
+
   }
 
   function placeMarkerAndPanTo(latLng, map) {
@@ -726,13 +795,29 @@ angular
     $scope.marker = marker;
     map.panTo(latLng);
   }
+
+});
 });
 angular
   .module('example')
   .controller('SettingsController', function($scope, supersonic){
   	$scope.radiusSlider = 2.0;
-    var toggleIcon = 0;
+    var toggleCategoryIcon = 0;
+    var toggleFrequencyIcon = 0;
+    var toggleRatingIcon = 0;
+    var toggleSortingIcon = 0;
     $scope.categoriesIcon = "super-chevron-down";
+     $scope.FrequencyIcon = "super-chevron-down";
+     $scope.RatingIcon = "super-chevron-down";
+     $scope.SortingIcon = "super-chevron-down";
+
+     $scope.selectedFrequency = {
+      value: 0.5};
+      $scope.selectedRating = {
+      value: 4};
+       $scope.selectedSorting = {
+      value: 'R'};
+
   	 $scope.typesList = [
                   {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
                   {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
@@ -740,14 +825,71 @@ angular
                   {'name':'Museums and Art','checked': true, 'icon':'ios-flask-outline'},
                   {'name':'Nature','checked': true, 'icon':'leaf'},
                   {'name':'Places of worship','checked': true, 'icon':'ios-moon-outline'}];
-     $scope.hideFilter = true;
 
+      $scope.FrequencyList = [
+                  {'name':'Manual', 'value': 100},
+                  {'name':'Every 10 seconds (Default)','value': 1/6},
+                  {'name':'Every 5 minutes','value': 5}, 
+                  {'name':'Every 10 minutes','value': 10},
+                  {'name':'Every 30 minutes','value': 30},
+                  {'name':'Every hour', 'value': 60}];
 
-   $scope.submitFilters = function()
-   {
+       $scope.RatingList = [
+                  {'name':'4 Stars & Up', 'value': 4},
+                  {'name':'3 Stars & Up','value': 3},
+                  {'name':'2 Stars & up','value': 2},
+                  {'name':'1 Star & up','value': 1}, 
+                  {'name':'None','value': 0}];
+
+      $scope.SortingList = [
+                  {'name':'Distance', 'value': 'D'},
+                  {'name':'Rating','value': 'R'}];
+
+     $scope.hideTypesFilter = true;
+     $scope.hideFrequencyFilter = true;
+     $scope.hideRatingFilter = true;
+     $scope.hideSortingFilter = true;
+
+    $scope.SetCurrentType =function(name)
+     {
+        setSelectedType(name);
         supersonic.data.channel('filters').publish($scope.typesList);
-        //window.localStorage.setItem("typesList",$scope.typesList);
-      }
+     }
+
+     var setSelectedType = function(name)
+     {
+        angular.forEach($scope.typesList, function(type)
+        {
+              if(name == type.name)
+              {
+                type.checked = !type.checked;
+              }
+        });
+     }
+
+     $scope.SetCurrentItem =function(value)
+     {
+        $scope.selectedFrequency.value = value;
+        supersonic.data.channel('refreshTime').publish(value);
+     }
+
+     $scope.SetCurrentRating =function(value)
+     {
+        $scope.selectedRating.value = value;
+        supersonic.data.channel('rating').publish(value);
+     }
+
+     $scope.SetCurrentSorting =function(value)
+     {
+        $scope.selectedSorting.value = value;
+        supersonic.data.channel('sorting').publish(value);
+     }
+
+   // $scope.submitFilters = function()
+   // {
+   //      supersonic.data.channel('filters').publish($scope.typesList);
+   //      //window.localStorage.setItem("typesList",$scope.typesList);
+   //    }
 
    $scope.removeView = function(){
    	var options = {
@@ -758,18 +900,53 @@ angular
 
    }
 
-   $scope.hideFilters = function(){
-   	$scope.hideFilter = !$scope.hideFilter;
-    if (toggleIcon == 0){
+   $scope.hideTypesFilters = function(){
+   	$scope.hideTypesFilter = !$scope.hideTypesFilter;
+    if (toggleCategoryIcon == 0){
       $scope.categoriesIcon = "super-chevron-up";
-      toggleIcon = 1;
+      toggleCategoryIcon = 1;
     }
     else{
       $scope.categoriesIcon = "super-chevron-down";
-      toggleIcon = 0;
+      toggleCategoryIcon = 0;
     }
    }
 
+   $scope.hideFrequencyFilters = function(){
+    $scope.hideFrequencyFilter = !$scope.hideFrequencyFilter;
+    if (toggleFrequencyIcon == 0){
+      $scope.FrequencyIcon = "super-chevron-up";
+      toggleFrequencyIcon = 1;
+    }
+    else{
+      $scope.FrequencyIcon = "super-chevron-down";
+      toggleFrequencyIcon = 0;
+    }
+   }
+
+   $scope.hideRatingFilters = function(){
+    $scope.hideRatingFilter = !$scope.hideRatingFilter;
+    if (toggleRatingIcon == 0){
+      $scope.RatingIcon = "super-chevron-up";
+      toggleRatingIcon = 1;
+    }
+    else{
+      $scope.RatingIcon = "super-chevron-down";
+      toggleRatingIcon = 0;
+    }
+   }
+
+   $scope.hideSortingFilters = function(){
+    $scope.hideSortingFilter = !$scope.hideSortingFilter;
+    if (toggleSortingIcon == 0){
+      $scope.SortingIcon = "super-chevron-up";
+      toggleSortingIcon = 1;
+    }
+    else{
+      $scope.SortingIcon = "super-chevron-down";
+      toggleSortingIcon = 0;
+    }
+   }
    $scope.translate = function(value){
    	return value + "mi";
    }
