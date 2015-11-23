@@ -1,4 +1,4 @@
-/*! steroids-js - v3.5.18 - 2015-11-17 15:12 */
+/*! steroids-js - v3.5.19 - 2015-11-18 14:03 */
 (function(window){
 var Bridge,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -2142,7 +2142,7 @@ NavigationBar = (function() {
         var parameters, relativeTo, _ref;
         relativeTo = (_ref = options.relativeTo) != null ? _ref : steroids.app.path;
         parameters = title ? {
-          title: title
+          title: String(title)
         } : {
           titleImagePath: relativeTo + options.titleImagePath
         };
@@ -2305,10 +2305,10 @@ NavigationBar = (function() {
       relativeTo = steroids.app.path;
       params = {};
       if (options.constructor.name === "String") {
-        params.title = options;
+        params.title = String(options);
       }
       if (options.title != null) {
-        params.title = options.title;
+        params.title = String(options.title);
         params.titleImagePath = "";
       }
       params.border = options.border;
@@ -4187,7 +4187,7 @@ Spinner = (function() {
 ;var _this = this;
 
 window.steroids = {
-  version: "3.5.18",
+  version: "3.5.19",
   Animation: Animation,
   File: File,
   views: {

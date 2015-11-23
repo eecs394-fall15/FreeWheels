@@ -1,7 +1,9 @@
+
 angular
   .module('example')
   .controller('NearbyController', function($scope, supersonic, ngGPlacesAPI, $http) {
     $scope.useOriginalArray = false;
+    $scope.filterView = new supersonic.ui.View("example#Settings");
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = ["Animals", "Library", "Museums and Art", "Nature", "Things to do", "Places of worship"] ;
     $scope.typesList = [
@@ -17,8 +19,38 @@ angular
     $scope.places = [];
     $scope.filteredPlaces = [];
 
-    $scope.radiusSlider = 2.0;
 
+    $scope.start = function(dest, isModal) {
+  var viewId=dest,
+      view=new supersonic.ui.View({
+        location: dest,
+        id: viewId
+      });
+  view.isStarted().then(function(started) {
+    if (started) {
+      if (isModal) {supersonic.ui.modal.show(view);}
+      else {supersonic.ui.layers.push(view);}
+    } else {
+      // Start Spinner
+      supersonic.ui.views.start(view).then(function() {
+        if (isModal) {supersonic.ui.modal.show(view);}
+        else {supersonic.ui.layers.push(view);}
+        // Stop Spinner
+      }, function(error) {
+        // Stop Spinner
+        A.error(error);
+      });
+    }
+  });
+};
+    $scope.openFilterView = function(){
+      //var modalView = new supersonic.ui.View("example#Settings");
+    var options = {
+      animate: true
+    }
+    $scope.start('example#Settings',true);
+    //supersonic.ui.modal.show($scope.filterView, options);
+    }
     $scope.translate = function(value)
     {
         return value + ' mi';
@@ -36,6 +68,9 @@ angular
         supersonic.ui.modal.show(modalView, options);
      }
 
+    supersonic.data.channel('radius').subscribe( function(value){
+      $scope.radiusSlider = value;
+    });
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
@@ -159,13 +194,18 @@ angular
           return returnValue;
     }
 
+     $scope.openGoogleMaps = function(navigateURL){
+        supersonic.app.openURL(navigateURL);
+      }
 
    $scope.findMeAwesomePlaces = function()
    {
+      supersonic.logger.log("in findMeAwesomePlaces");
       $scope.useOriginalArray = true;
       $scope.places = [];
       $scope.filteredPlaces = [];
       supersonic.device.geolocation.getPosition().then( function(position) {
+        supersonic.logger.log("LAT:" + position.coords.latitude);
       var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       var defaultTypes = ['art_gallery',
                   'aquarium',
@@ -186,9 +226,6 @@ angular
                   'library'
                   ];
       // Specify location, radius and place types for your Places API search.
-      $scope.openGoogleMaps = function(navigateURL){
-        supersonic.app.openURL(navigateURL);
-      }
       var requestTypes = [];
       angular.forEach($scope.types, function(type)
       {
@@ -222,7 +259,7 @@ angular
           requestTypes.push('aquarium');
         }
       });
-
+  supersonic.logger.log("RADIUS LINE 262" + $scope.radiusSlider);
       var request = {
           location: myLocation,
           radius: $scope.radiusSlider * 1609.34,
@@ -233,7 +270,9 @@ angular
     // Handle the callback with an anonymous function.
       var service = new google.maps.places.PlacesService(map);
        service.nearbySearch(request, function(results, status) {
+        supersonic.logger.log("success");
           if (status == google.maps.places.PlacesServiceStatus.OK) {
+            supersonic.logger.log("details");
             angular.forEach(results, function(result)
             {
                    request = {

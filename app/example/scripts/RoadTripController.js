@@ -1,12 +1,23 @@
 angular
   .module('example')
-  .controller('RoadTripController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap, $timeout) {
+  .controller('RoadTripController', function($scope, supersonic, ngGPlacesAPI, $http, NgMap, $timeout, $interval) {
     $scope.navbarTitle = "Settings";
+    $scope.filterView = new supersonic.ui.View("example#Settings");
     $scope.my = { newPlaces: false };
     $scope.places = [];
+    $scope.visibleplaces = [];
     $scope.useOriginalArray = false;
     $scope.categoryChoices = [true,true,true,true,true,true,true,true,true,true,true];
     $scope.types = [];
+    $scope.filteredPlaces = [];
+    $scope.latlng = "";
+    $scope.refreshTime = 0.5;
+    $scope.minRating = 3;
+    $scope.sortBy = 'R';
+    $scope.prevLatLng = "";
+    var promise;
+
+
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
                   {'name':'Library','checked': true},
@@ -15,26 +26,115 @@ angular
                   {'name':'Amusement','checked': true},
                   {'name':'Places of worship','checked': true}];
 
-    $scope.radiusSlider = 2.0;
     $scope.translate = function(value)
     {
         return value + ' mi';
     }
 
+      //MAP STUFF
+     $scope.marker = null;
+    supersonic.device.geolocation.getPosition().then( function(position) {
+      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      $scope.latlng = myLocation;
+      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
+
+    var refreshPlaces = function() {
+      supersonic.logger.log("REFRESH CALLED");
+      $scope.previousPlaces = $scope.places.slice();
+     findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
+      //supersonic.logger.log(angular.toJson($scope.visibleplaces));
+      if (!compareArrays(arr1, arr2)){
+        newPlacesNearby();
+      }
+     });
+    }
+
+    promise = $interval(refreshPlaces, $scope.refreshTime * 60000);
+
     var newPlacesNearby = function()
     {
+      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      if($scope.places.length)
       $scope.my.newPlaces = true;
-      $timeout(function() {$scope.my.newPlaces = false;}, 3000);
     }
+
+    $scope.pushNewPlaces = function() {
+      //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      $scope.visibleplaces = angular.copy($scope.places);
+      $scope.my.newPlaces = false;
+    }
+
+        $scope.start = function(dest, isModal) {
+  var viewId=dest,
+      view=new supersonic.ui.View({
+        location: dest,
+        id: viewId
+      });
+  view.isStarted().then(function(started) {
+    if (started) {
+      if (isModal) {supersonic.ui.modal.show(view);}
+      else {supersonic.ui.layers.push(view);}
+    } else {
+      // Start Spinner
+      supersonic.ui.views.start(view).then(function() {
+        if (isModal) {supersonic.ui.modal.show(view);}
+        else {supersonic.ui.layers.push(view);}
+        // Stop Spinner
+      }, function(error) {
+        // Stop Spinner
+        A.error(error);
+      });
+    }
+  });
+};
+    $scope.openFilterView = function(){
+      //var modalView = new supersonic.ui.View("example#Settings");
+    var options = {
+      animate: true
+    }
+    $scope.start('example#Settings',true);
+    //supersonic.ui.modal.show($scope.filterView, options);
+    }
+
 
     supersonic.data.channel('filters').subscribe( function(message) {
       $scope.typesList = message;
       $scope.types = filterTypes($scope.typesList);
-      supersonic.logger.log($scope.types);
-      $scope.filteredPlaces = filterExistingPlaces($scope.types);
-      supersonic.logger.log($scope.places);
-      supersonic.logger.log($scope.filteredPlaces);
-      $scope.useOriginalArray = false;
+      supersonic.logger.log("TYPES:" + $scope.types);
+      $scope.filteredPlaces = [];
+      if($scope.types.length)
+      {
+        $scope.filteredPlaces = filterExistingPlaces($scope.types);
+        if($scope.filteredPlaces.length)
+        {
+        $scope.filteredPlaces = $scope.filteredPlaces.sort(function(a,b){
+                  if (!a.rating){return 1;}
+                  if (!b.rating){return -1;}
+                  return b.rating - a.rating;
+                });
+        $scope.useOriginalArray = false;
+      }
+      }
+      $scope.$apply();
+    });
+
+     supersonic.data.channel('radius').subscribe( function(value){
+      $scope.radiusSlider = value;
+    });
+
+     supersonic.data.channel('rating').subscribe( function(value){
+      $scope.minRating = value;
+    });
+      supersonic.data.channel('sorting').subscribe( function(value){
+      $scope.sortBy = value;
+    });
+
+      supersonic.data.channel('refreshTime').subscribe( function(value){
+      //supersonic.logger.log("REFRESHTIME:" + value + "," + "MINRATING:" + $scope.minRating);
+      $interval.cancel(promise);
+      $scope.refreshTime = value;
+      if($scope.refreshTime != 0)
+      promise =  $interval(refreshPlaces, $scope.refreshTime * 60000);
     });
 
     var filterExistingPlaces = function(types)
@@ -64,18 +164,6 @@ angular
         return filteredArray;
     }
 
-
-   $scope.location1 = function(){
-   	 findMeAwesomePlaces(42.0564634,-87.6774557);
-   } 
-
-   $scope.location2 = function(){
-   	 findMeAwesomePlaces( 41.7055756,-86.2375275);
-   } 
-
-   $scope.location3 = function(){
-   	 findMeAwesomePlaces(42.2780475,-83.7404128);
-   } 
   $scope.openGoogleMaps = function(navigateURL){
     supersonic.app.openURL(navigateURL);
   }
@@ -154,9 +242,12 @@ angular
                 if(details != null && details.photos != undefined && details.photos != null)
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
-                 supersonic.logger.log(photo);
+                 //supersonic.logger.log(photo);
                  var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
-                $scope.places.push({
+                 var distance = google.maps.geometry.spherical.computeDistanceBetween($scope.latlng, result.geometry.location) * 0.000621371;
+                 if((result.rating >= $scope.minRating) || (result.rating == null && $scope.minRating == 0))
+                {
+                  $scope.places.push({
                     name: result.name,
                     icon: result.icon,
                     vicinity: result.vicinity,
@@ -165,14 +256,26 @@ angular
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
-                    navstr: navstring
+                    navstr: navstring,
+                    distance: distance
                   });
+                }
                 // supersonic.logger.log("162:" + $scope.places.length);
-                $scope.places = $scope.places.sort(function(a,b){
-                  if (!a.rating){return 1;}
-                  if (!b.rating){return -1;}
-                  return b.rating - a.rating;
-                });
+                if($scope.sortBy == 'R')
+                {
+                    $scope.places = $scope.places.sort(function(a,b){
+                      if (!a.rating){return 1;}
+                      if (!b.rating){return -1;}
+                      return b.rating - a.rating;
+                    });
+                }
+                else if($scope.sortBy == 'D')
+                {
+                    $scope.places = $scope.places.sort(function(a,b){
+                      return a.distance - b.distance;
+                    });
+
+                }
                  // supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                 callback($scope.previousPlaces, $scope.places); 
                 $scope.$apply();
@@ -181,43 +284,145 @@ angular
             });
         }  
       });
+      $scope.filteredPlaces = $scope.places;
   }
-
-  //MAP STUFF
-  $scope.marker = null;
-    supersonic.device.geolocation.getPosition().then( function(position) {
-      var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-      $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
-      supersonic.logger.log("loc: " + myLocation.lat() + "," +myLocation.lng());
-    });
+    
 
     NgMap.getMap().then(function(map) {
+      placeMarkerAndPanTo($scope.latlng, map);
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
-       $scope.previousPlaces = $scope.places.slice();
-       findMeAwesomePlaces(e.latLng, function(arr1, arr2) {
-        if (!compareArrays(arr1, arr2)){
-          newPlacesNearby();
-        }
-       });
-
-       
+       $scope.prevLatLng = angular.copy($scope.latlng);
+       $scope.latlng = e.latLng;
+       //supersonic.logger.log("PREV LATLONG:" + $scope.prevLatLng.lat());
+       //supersonic.logger.log("NEW LATLONG:" + $scope.latlng.lat());
+       if($scope.refreshTime == 0)
+          refreshPlaces();
       });
     });
 
-  function compareArrays(Array1, Array2){
+   
 
-        for (i = 0; i < Array2.length; i++){
-          var foundName = false;
-          for (j = 0; j < Array1.length; j++){
-            if (Array1[j].name == Array2[i].name){
-              foundName = true;
-            }
+  var filterExistingPlaces = function(types)
+    {
+      var filteredPlaces = [];
+      loop1:
+       for(var i = 0; i < types.length; i++)
+       { //supersonic.logger.log("i: "  + i);
+          loop2:
+          for(var j = 0; j < $scope.places.length; j++)
+          {
+              //supersonic.logger.log("j: " + j + "Place:" + $scope.places[j].name);
+              var placesTypes = $scope.places[j].types;
+              loop3:
+              for(var k = 0; k < placesTypes.length; k++)
+              {         
+                  if(matchType(types[i], placesTypes[k]))
+                    {
+                     // supersonic.logger.log("Type: " + types[i] +  "Place:"  + $scope.places[j].name + "PlaceType: " + placesTypes[k]) ;  
+                      //supersonic.logger.log("k: " + k + "," + "name:" + $scope.places[j].name + "," + placesTypes[k]);
+                      //supersonic.logger.log($scope.places[j].name + "," + types[i] + "," + placesTypes[k]);
+                      filteredPlaces.push($scope.places[j]);
+                      continue loop2;
+                    }
+              }
           }
-          if (!foundName)
-            {return false;}
+       }
+         return filteredPlaces;
+     }
+
+     var filterTypes = function(list)
+    {
+      var filteredArray = [];
+      angular.forEach(list, function(value, key)
+      {
+          if(value.checked == true)
+            filteredArray.push(value.name);
+      });
+        return filteredArray;
+    }
+
+    var matchType = function(type, placeType)
+    {
+      var returnValue = false;
+        switch(type)
+         { case "Places of worship":
+              if(placeType == "church" || placeType == "hindu_temple"
+                || placeType == "synagogue" || placeType == "place_of_worship" 
+                || placeType == "mosque")
+              {
+                returnValue =  true;
+              }
+              break;
+           case "Museums and Art":
+              if(placeType == "museum" || placeType == "art_gallery")
+              {
+                returnValue = true;         
+              }
+              break;
+             case "Nature":
+              if(placeType == "park" || placeType == "campground"
+                || placeType == "natural_feature")
+              {
+                returnValue =  true;       
+              }
+              break;
+             case "Amusement":
+              if(placeType == "stadium" || placeType == "casino"
+                || placeType == "bowling_alley" || placeType == "amusement_park" )
+              {
+                 returnValue =  true;
+              };
+              break;
+            case "Animals":
+              if(placeType == "zoo" || placeType == "aquarium")
+              {
+                returnValue =  true;
+              };
+              break;
+            case "Library":
+              if(placeType == "library")   
+              {
+                  returnValue =  true;
+              }
+              break;       
+          }
+          return returnValue;
+    }
+
+  function compareArrays(Array1, Array2){
+       // supersonic.logger.log("Compare Called:" + Array1.length + "," +  Array2.length);
+        // for (i = 0; i < Array2.length; i++){
+        //   var foundName = false;
+        //   for (j = 0; j < Array1.length; j++){
+        //     if (Array1[j].name == Array2[i].name){
+        //       foundName = true;
+        //     }
+        //   }
+        //   if (!foundName)
+        //     {return false;}
+        // }
+        // return true;
+        if($scope.prevLatLng == "")
+        {
+          supersonic.logger.log("1st time");
+            return false;
         }
-        return true;
+        else
+        {
+          var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
+         supersonic.logger.log("DISTANCE in metres:"  + d);
+
+         if(d >= 2000)
+          {
+            return false;
+          }
+         else
+         {
+            return true;
+         }
+       }
+
   }
 
   function placeMarkerAndPanTo(latLng, map) {
@@ -231,4 +436,6 @@ angular
     $scope.marker = marker;
     map.panTo(latLng);
   }
+
+});
 });

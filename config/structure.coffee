@@ -4,11 +4,11 @@ module.exports =
 
   # See styling options for tabs and other native components in app/common/native-styles/ios.css or app/common/native-styles/android.css
   tabs: [
-    {
-      title: "Nearby Search"
-      id: "nearby"
-      location: "example#nearby" # Supersonic module#view type navigation
-    }
+    #{
+    #  title: "Nearby Search"
+     # id: "nearby"
+    #  location: "example#nearby" # Supersonic module#view type navigation
+    #}
     {
       title: "Road Trip"
       id: "roadtrip"
@@ -28,15 +28,13 @@ module.exports =
       id: "using-the-scanner"
       location: "example#using-the-scanner"
     }
+    {
+      id: "Settings"
+      location: "example#Settings"
+    }
   ]
 
-  drawers:
-    left:
-      id: "leftDrawer"
-      location: "example#drawer"
-      showOnAppLoad: false
-    options:
-      animation: "swingingDoor"
+
   # drawers:
   #   left:
   #     id: "leftDrawer"

@@ -7,18 +7,12 @@
     {
       "id": "using-the-scanner",
       "location": "http://localhost/app/example/using-the-scanner.html"
+    },
+    {
+      "id": "Settings",
+      "location": "http://localhost/app/example/Settings.html"
     }
   ],
-  "drawers": {
-    "left": {
-      "id": "leftDrawer",
-      "location": "http://localhost/app/example/drawer.html",
-      "showOnAppLoad": false
-    },
-    "options": {
-      "animation": "swingingDoor"
-    }
-  },
   "tabs": [
     {
       "position": 0,
