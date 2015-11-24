@@ -75,13 +75,13 @@ angular
 
     var newPlacesNearby = function()
     {
-      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
       if($scope.places.length)
       $scope.my.newPlaces = true;
     }
 
     $scope.pushNewPlaces = function() {
-      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
       $scope.visibleplaces = angular.copy($scope.places);
       $scope.my.newPlaces = false;
     }
@@ -270,6 +270,30 @@ angular
                  var distance = google.maps.geometry.spherical.computeDistanceBetween($scope.latlng, result.geometry.location) * 0.000621371;
                  if((result.rating >= $scope.minRating) || (result.rating == null && $scope.minRating == 0))
                 {
+                  var d = new Date();
+                  var day = d.getDay();
+                  var openhours = "";
+
+                  supersonic.logger.log("Opening hours" + result.name + ":" + angular.toJson(result.opening_hours));
+                  if (result.opening_hours != null){
+                       supersonic.logger.log("periods" + result.opening_hours.periods);
+                    if(result.opening_hours.weekday_text != undefined && result.opening_hours.weekday_text.length){
+                        openhours = result.opening_hours.weekday_text[day];
+                        supersonic.logger.log("weekday:" + openhours);
+                    } else {
+                      if (result.opening_hours.open_now){
+                        openhours = "Open Now"
+                      } else {
+                        openhours = "Closed"
+                      }
+
+                      supersonic.logger.log("No weekday:" + openhours);
+                    }
+                  } else {
+                    openhours = "No hours"
+                  }
+                  //var openhours = result.opening_hours.weekday_text[day];
+                  //supersonic.logger.log(openhours);
                   $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -280,7 +304,8 @@ angular
                     photo: photo,
                     types: result.types,
                     navstr: navstring,
-                    distance: distance
+                    distance: distance,
+                    openhours: openhours
                   });
                 }
                 // supersonic.logger.log("162:" + $scope.places.length);
@@ -299,7 +324,7 @@ angular
                     });
 
                 }
-                 supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
+                 //supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                 callback($scope.previousPlaces, $scope.places); 
                 $scope.$apply();
               }

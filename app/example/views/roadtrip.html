@@ -32,17 +32,25 @@
 
       <div id="map" style="height:100%"></div>
 
-    <div ng-repeat="place in visibleplaces" class="list card">
+<div class = "list">
 
-  <div class="item item-avatar">
+
+    <li class="item item-thumbnail-right" href="#" ng-repeat="place in visibleplaces">
+      <img src={{place.photo}}>
+      <h2 style = "text-align:left">{{place.name}}  
+        <span style="float:right">{{place.distance | number:1}} mi<span> </h2>
+      <p>{{place.openhours}}</p>
+    </li>
+
+
+<!--   <div class="item item-avatar">
     <img src={{place.icon}}>
     <h2>{{place.name}}</h2>
     <p>{{place.vicinity}}</p>
-  </div>
+  </div> -->
 
-  <div class="item item-body">
+ <!--  <div class="item item-body">
     <img class="full-image" src={{place.photo}})>
-    <!-- <super-navigate class="button button-positive" location="example#navigate" data-params-id="{{place.name}}"> Navigate</super-navigate> -->
     <button class="button button-calm" ng-click="openGoogleMaps(place.navstr)">Navigate</button>
     <h3>Address:</h3> 
     </p> {{place.address}}</p>
@@ -53,7 +61,7 @@
      <h3>Distance:</h3> 
     </p> {{place.distance | number:1}} miles</p>
   </div>
-
+ -->
 </div>
 </body>
 
