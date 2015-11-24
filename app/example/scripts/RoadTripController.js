@@ -274,14 +274,15 @@ angular
                   var day = d.getDay();
                   var openhours = "";
 
-                  supersonic.logger.log("Opening hours" + result.name + ":" + angular.toJson(result.opening_hours));
-                  if (result.opening_hours != null){
-                       supersonic.logger.log("periods" + result.opening_hours.periods);
-                    if(result.opening_hours.weekday_text != undefined && result.opening_hours.weekday_text.length){
-                        openhours = result.opening_hours.weekday_text[day];
+                  supersonic.logger.log("Opening hours" + result.name + ":" + angular.toJson(details.opening_hours));
+                  if (details.opening_hours != null){
+                       supersonic.logger.log("periods" + details.opening_hours.periods);
+                    if(details.opening_hours.weekday_text != undefined && details.opening_hours.weekday_text.length){
+                        openhours = details.opening_hours.weekday_text[day];
+                        openhours = openhours.split(/:(.+)?/)[1];
                         supersonic.logger.log("weekday:" + openhours);
                     } else {
-                      if (result.opening_hours.open_now){
+                      if (details.opening_hours.open_now){
                         openhours = "Open Now"
                       } else {
                         openhours = "Closed"
@@ -294,6 +295,7 @@ angular
                   }
                   //var openhours = result.opening_hours.weekday_text[day];
                   //supersonic.logger.log(openhours);
+                  supersonic.logger.log("DEETAILS" + angular.toJson(details));
                   $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -305,7 +307,8 @@ angular
                     types: result.types,
                     navstr: navstring,
                     distance: distance,
-                    openhours: openhours
+                    openhours: openhours,
+                    website: details.website != undefined? details.website: ""
                   });
                 }
                 // supersonic.logger.log("162:" + $scope.places.length);
