@@ -16,8 +16,13 @@ angular
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
     var promise;
+    var firstTime = true;
     supersonic.ui.tabs.hide();
 
+
+    $scope.toggleMap = function() {
+      supersonic.logger.log("TOGGLEMAP!");
+    }
 
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
@@ -55,9 +60,11 @@ angular
 
     $scope.startPlaces = function() {
      supersonic.logger.log("lat long start: " + $scope.latlng);
+      $scope.prevLatLng = $scope.latlng;
       // $scope.previousPlaces = $scope.places.slice();
      findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
       $scope.pushNewPlaces();
+       firstTime = false;
       //supersonic.logger.log(angular.toJson($scope.visibleplaces));
      });
     }
@@ -76,7 +83,7 @@ angular
     var newPlacesNearby = function()
     {
       //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
-      if($scope.places.length) {
+      if($scope.places.length != $scope.visibleplaces.length) {
       $scope.my.newPlaces = true;
       }
     }
@@ -458,10 +465,14 @@ angular
         //     {return false;}
         // }
         // return true;
-        if($scope.prevLatLng == "")
+        if(firstTime)
         {
           supersonic.logger.log("1st time");
             return false;
+        }
+        else if($scope.prevLatLng == $scope.latlng)
+        {
+          return true;
         }
         else
         {
@@ -477,6 +488,7 @@ angular
             return true;
          }
        }
+
 
   }
 
