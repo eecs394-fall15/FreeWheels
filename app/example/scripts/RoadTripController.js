@@ -76,8 +76,9 @@ angular
     var newPlacesNearby = function()
     {
       //supersonic.logger.log("NEW PLACES:" + $scope.places.length);
-      if($scope.places.length)
+      if($scope.places.length) {
       $scope.my.newPlaces = true;
+      }
     }
 
     $scope.pushNewPlaces = function() {
@@ -305,6 +306,7 @@ angular
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
+                    type: result.types[0],
                     navstr: navstring,
                     distance: distance,
                     openhours: openhours,

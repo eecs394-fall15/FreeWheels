@@ -32,17 +32,19 @@
 
       <div id="map" style="height:100%"></div>
 
-<div class = "list">
+<div class = "list cards" ng-repeat="place in visibleplaces">
 
 
-    <li class="item item-thumbnail-right" href="#" ng-repeat="place in visibleplaces">
-      <img src={{place.photo}}>
-      <h2 style = "text-align:left">{{place.name}}  
+    <div class="item item-body" href="#">
+      <img class="full-image" src={{place.photo}}>
+      <h2 style = "text-align:left;"><span style="font-weight: bold;">{{place.name}}</span>  
         <span style="float:right">{{place.distance | number:1}} mi<span> </h2>
-      <p>{{place.openhours}}</p>
-       <!-- <a ng-href = {{place.website}}>Go To Website</a> -->
+      <p style = "text-align: left;">{{place.type}}
+      <span style="float: right;">Open: {{place.openhours}}</span></p>
+      <p> <a ng-href = {{place.website}}>{{place.website}}</a></p>
+     <p style="text-align: center;"> <button class="button" id="navbutton" ng-click="openGoogleMaps(place.navstr)">Navigate</button></p>
     </li>
-
+</div>
 
 <!--   <div class="item item-avatar">
     <img src={{place.icon}}>
@@ -63,7 +65,6 @@
     </p> {{place.distance | number:1}} miles</p>
   </div>
  -->
-</div>
 </body>
 
 </div>
