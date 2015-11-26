@@ -35,7 +35,7 @@ var refreshBtn = new supersonic.ui.NavigationBarButton({
 })
 
 supersonic.ui.navigationBar.update({
-  title: "RoadTrip",
+  title: "FreeWheels",
   overrideBackButton: false,
   buttons: {
     left: [filterBtn],
