@@ -23,6 +23,14 @@ navigation-bar button {
   margin-right: 6px;
 }
 
+#nav-filter{
+ background-image: url(icons/filters.png);
+}
+
+#nav-refresh{
+ background-image: url(icons/refresh.png);
+}
+
 navigation-bar back-indicator {
   background-image: url(default_back_icon.png);
   background-size: 18;
@@ -60,12 +68,12 @@ tab-bar tab-bar-item marker-top:selected {
   background-color: #1596f7;
 }
 
-tab-bar-item#settings {
-  background-image: url(icons/cog.svg);
+tab-bar-item#roadtrip {
+  background-image: url(icons/car.png);
 }
 
-tab-bar-item#index {
-  background-image: url(icons/home.svg);
+tab-bar-item#nearby {
+  background-image: url(icons/locate.png);
 }
 
 tab-bar-item#internet {

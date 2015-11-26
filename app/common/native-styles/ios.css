@@ -19,6 +19,14 @@ navigation-bar button, navigation-bar back-bar-button {
   font-weight: 300;
 }
 
+#nav-filter icon{
+ background-image: url(icons/filters.png);
+}
+
+#nav-refresh icon{
+ background-image: url(icons/refresh.png);
+}
+
 tab-bar {
   background-color: #ffffff;
   border-top: 1px #d8d8d8 solid;
