@@ -11,7 +11,7 @@ angular
     $scope.types = [];
     $scope.filteredPlaces = [];
     $scope.latlng = "";
-    $scope.refreshTime = 0.5;
+    $scope.refreshTime = 1/6;
     $scope.minRating = 0;
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
@@ -146,10 +146,12 @@ supersonic.ui.navigationBar.update({
           var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
          supersonic.logger.log("DISTANCE in metres:"  + d);
 
-         if(d >= 2000)
+         if(d >= 1000)
           {
             supersonic.logger.log("success");
+            $scope.prevLatLng = $scope.latlng;
             return false;
+
           }
          else
          {
