@@ -1,16 +1,17 @@
 <div class="padding" ng-controller="RoadTripController">
 
-  <super-navbar>
-  <super-navbar-button ng-click = "openFilterView()">
-    Filters
-  </super-navbar-button>
+  <!-- <super-navbar>
+ <!--  <super-navbar-button id="filter" ng-click = "openFilterView()">
+  </super-navbar-button> -->
+ <!--  <super-navbar-button ng-click = "toggleMap()">&nbsp;
+    </super-navbar-button>
     <super-navbar-title>
       Road Trip
-    </super-navbar-title>
-    <super-navbar-button side="right" ng-click = "manualRefresh()">
-      Refresh
-    </super-navbar-button>
-  </super-navbar>
+    </super-navbar-title> -->
+   <!--  <super-navbar-button  id="refresh" side="right" ng-click = "manualRefresh()">
+      &nbsp;
+    </super-navbar-button> -->
+  <!-- </super-navbar> --> 
   
   <body style="height:100%">
 
@@ -25,24 +26,50 @@
                 rz-slider-translate="translate"
                 rz-slider-model="radiusSlider"</rzslider>
     </div> -->
-
+   <div id="map" ng-if = "showMap" style="height:100%">
     <map center="{{mapCenter}}" zoom="12"></map>
+   </div>
+    <!-- <marker position="{{latlng}}"></marker> -->
 
-  <img src="https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white2.png"/>
+  <img src="https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white2.png" ng-click = "toggleMap()"/>
+     <!-- <div class="row">
+    <div class="col-sm-7">
+        <label class="control-label">Extra Small Rating</label>
+        <input id="input-6a" class="rating" value="1" data-min="0" data-max="5" data-step="0.5" data-size="xs">
+        <label class="control-label">Small Rating</label>
+        <input id="input-6b" class="rating" value="2" data-min="0" data-max="5" data-step="0.5" data-size="sm">
+    </div>
+    <div class="col-sm-5">
+        <div class="alert alert-info">Control the size of stars by passing the size parameter. Use these codes in increasing order of size - "xs" being the smallest and "xl" being the largest: "xs", "sm", "md", "lg", "xl"</div>    </div>
+</div> -->
 
-      <div id="map" style="height:100%"></div>
+<div class="card container" ng-repeat="place in visibleplaces">
+      <img class="card-img-top" src={{place.photo}} height="200" width="100%">
+      <h4 style = "text-align:left;">{{place.name}}
+      <span style="float:right">{{place.distance | number:1}} Mi<span></h4>  
+      <p style = "text-align: left;">{{place.type}}
+      <span style="float: right;">Open: {{place.openhours}}</span></p>
+      <bs-rating value={{place.rating}} data-show-clear="false" data-size="xs" readonly="true"></bs-rating>
+       <p> <a ng-click = "openWebsite(place.website)">{{place.website}}</a></p>
+        <p style="text-align: center;">
+        <button class="button" id="navbutton" ng-click="openGoogleMaps(place.navstr)">Navigate</button>
+        </p>
+  <!-- </ul> -->
+   <!--    <h2 style = "text-align:left;"><span style="font-weight: bold;">{{place.name}}</span>  
+        <span style="float:right">{{place.distance | number:1}} mi<span> </h2>
+      <p style = "text-align: left;">{{place.type}}
+      <span style="float: right;">Open: {{place.openhours}}</span></p>
+      <p> <a ng-href = {{place.website}}>{{place.website}}</a></p> -->
+</div>
 
-    <div ng-repeat="place in visibleplaces" class="list card">
-
-  <div class="item item-avatar">
+<!--   <div class="item item-avatar">
     <img src={{place.icon}}>
     <h2>{{place.name}}</h2>
     <p>{{place.vicinity}}</p>
-  </div>
+  </div> -->
 
-  <div class="item item-body">
+ <!--  <div class="item item-body">
     <img class="full-image" src={{place.photo}})>
-    <!-- <super-navigate class="button button-positive" location="example#navigate" data-params-id="{{place.name}}"> Navigate</super-navigate> -->
     <button class="button button-calm" ng-click="openGoogleMaps(place.navstr)">Navigate</button>
     <h3>Address:</h3> 
     </p> {{place.address}}</p>
@@ -53,8 +80,7 @@
      <h3>Distance:</h3> 
     </p> {{place.distance | number:1}} miles</p>
   </div>
-
-</div>
+ -->
 </body>
 
 </div>

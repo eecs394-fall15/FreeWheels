@@ -8,7 +8,9 @@
     "angularjs-google-places": "0.1.0",
     "angularjs-slider": "1.x",
     "ngmap":"1.x",
-    "jquery": "3.x",
-    "bootstrap": "3.x"
+    "jquery": "2.x",
+    "bootstrap": "3.x",
+     "async": "1.x",
+     "bootstrap-star-rating": "3.x"
   }
 }

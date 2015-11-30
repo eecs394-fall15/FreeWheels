@@ -11,13 +11,82 @@ angular
     $scope.types = [];
     $scope.filteredPlaces = [];
     $scope.latlng = "";
-    $scope.refreshTime = 0.5;
-    $scope.minRating = 3;
+    $scope.refreshTime = 1/6;
+    $scope.minRating = 0;
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
-    var promise;
-    supersonic.ui.tabs.hide();
 
+    $scope.useDeviceLocation = true;
+
+    var promise, map;
+    supersonic.ui.tabs.hide();
+      $scope.showMap = true;
+     //$("#input-id").rating();
+
+  var filterBtn = new supersonic.ui.NavigationBarButton({
+  onTap: function() {
+    $scope.openFilterView();
+  },
+  styleId: "nav-filter"
+})
+
+var refreshBtn = new supersonic.ui.NavigationBarButton({
+  onTap: function() {
+   $scope.manualRefresh();
+  },
+  styleId: "nav-refresh"
+})
+
+supersonic.ui.navigationBar.update({
+  title: "FreeWheels",
+  overrideBackButton: false,
+  buttons: {
+    left: [filterBtn],
+    right: [refreshBtn]
+  }
+}).then(supersonic.ui.navigationBar.show());
+
+    function placeMarkerAndPanTo(latLng, map) {
+    supersonic.logger.log("create marker" + $scope.marker);
+   if ($scope.marker){
+     $scope.marker.setMap(null);
+  }
+
+    var marker = new google.maps.Marker({
+      position: latLng,
+      map: map
+    });
+    $scope.marker = marker;
+    supersonic.logger.log("creating marker" + $scope.marker);
+     $scope.marker.setMap(map);
+  }
+
+    $scope.toggleMap = function() {
+      supersonic.logger.log("TOGGLEMAP!");
+      $scope.showMap = !$scope.showMap;
+      $scope.useDeviceLocation = false;
+      if($scope.showMap)
+      {
+        supersonic.logger.log("Create Map");
+        $scope.mapCenter = $scope.latlng.lat() + "," +$scope.latlng.lng();
+       NgMap.getMap().then(function(map) {
+        $scope.marker = null;
+          google.maps.event.trigger(map,'resize');
+
+          placeMarkerAndPanTo($scope.latlng, map);
+
+      //     supersonic.logger.log("map created");
+        
+          map.addListener('click', function(e) {
+          placeMarkerAndPanTo(e.latLng, map);
+        $scope.prevLatLng = angular.copy($scope.latlng);
+        $scope.latlng = e.latLng;
+       if($scope.refreshTime == 0)
+          refreshPlaces();
+        });
+      });
+      }
+    }
 
     $scope.typesList = [
                   {'name':'Animals','checked': true}, 
@@ -42,27 +111,68 @@ angular
       $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
 
 
-    var refreshPlaces = function() {
+    function refreshPlaces () {
       supersonic.logger.log("REFRESH CALLED");
       $scope.previousPlaces = $scope.places.slice();
-     findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
-      //supersonic.logger.log(angular.toJson($scope.visibleplaces));
-      if (!compareArrays(arr1, arr2)){
-        newPlacesNearby();
+      
+      if ($scope.useDeviceLocation){
+        supersonic.device.geolocation.getPosition().then( function(position) {
+          var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          $scope.latlng = myLocation;
+        });
       }
-     });
+
+      findMeAwesomePlaces($scope.latlng, 1);
+     // findMeAwesomePlaces($scope.latlng, function() {
+     //  //supersonic.logger.log(angular.toJson($scope.visibleplaces));
+     //  if (!compareArrays(arr1, arr2)){
+     //    newPlacesNearby();
+     //  }
+     // });
     }
 
     $scope.startPlaces = function() {
      supersonic.logger.log("lat long start: " + $scope.latlng);
+      //$scope.prevLatLng = $scope.latlng;
       // $scope.previousPlaces = $scope.places.slice();
-     findMeAwesomePlaces($scope.latlng, function(arr1, arr2) {
-      $scope.pushNewPlaces();
-      //supersonic.logger.log(angular.toJson($scope.visibleplaces));
-     });
+      findMeAwesomePlaces($scope.latlng, 0);
+     // findMeAwesomePlaces($scope.latlng, function() {
+     //  $scope.pushNewPlaces();
+     //   //firstTime = false;
+     //  //supersonic.logger.log(angular.toJson($scope.visibleplaces));
+     // });
     }
 
     
+    function compareArrays(){
+       supersonic.logger.log("compareArrays:PREV:" + $scope.prevLatLng + ",CURRENT:" +  $scope.latlng);
+
+        if($scope.prevLatLng == "")
+        {
+          supersonic.logger.log("1st time");
+          $scope.prevLatLng = angular.copy($scope.latlng);
+            return false;
+        }
+        else
+        {
+          var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
+         supersonic.logger.log("DISTANCE in metres:"  + d);
+
+         if(d >= 1000)
+          {
+            supersonic.logger.log("success");
+            $scope.prevLatLng = $scope.latlng;
+            return false;
+
+          }
+         else
+         {
+           supersonic.logger.log("failed");
+            
+            return true;
+         }
+       }
+  }
 
     promise = $interval(refreshPlaces, $scope.refreshTime * 60000);
 
@@ -73,21 +183,22 @@ angular
       refreshPlaces();
     }
 
-    var newPlacesNearby = function()
+    function newPlacesNearby()
     {
       supersonic.logger.log("NEW PLACES:" + $scope.places.length);
-      if($scope.places.length)
+      if($scope.places.length) {
       $scope.my.newPlaces = true;
+      }
     }
 
     $scope.pushNewPlaces = function() {
-      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+      supersonic.logger.log("FIRST TIME NEW PLACES:" + $scope.places.length);
       $scope.visibleplaces = angular.copy($scope.places);
       $scope.my.newPlaces = false;
     }
 
-        $scope.start = function(dest, isModal) {
-  var viewId=dest,
+    $scope.start = function(dest, isModal) {
+       var viewId=dest,
       view=new supersonic.ui.View({
         location: dest,
         id: viewId
@@ -190,7 +301,11 @@ angular
     supersonic.app.openURL(navigateURL);
   }
 
-   var findMeAwesomePlaces = function(myLocation, callback)
+  $scope.openWebsite = function(navigateURL){
+    supersonic.app.openURL(navigateURL);
+  }
+
+   function findMeAwesomePlaces(myLocation, firstTime)
    {
       supersonic.logger.log(myLocation);
       $scope.useOriginalArray = true;
@@ -256,8 +371,9 @@ angular
       var service = new google.maps.places.PlacesService(map);
        service.nearbySearch(request, function(results, status) {
           if (status == google.maps.places.PlacesServiceStatus.OK) {
-            angular.forEach(results, function(result)
+            async.each(results, function(result, callback)
             {
+              //supersonic.logger.log("index:" + index);
                    request = {
                 placeId : result.place_id
               } 
@@ -270,6 +386,32 @@ angular
                  var distance = google.maps.geometry.spherical.computeDistanceBetween($scope.latlng, result.geometry.location) * 0.000621371;
                  if((result.rating >= $scope.minRating) || (result.rating == null && $scope.minRating == 0))
                 {
+                  var d = new Date();
+                  var day = d.getDay();
+                  var openhours = "";
+
+                  //supersonic.logger.log("Opening hours" + result.name + ":" + angular.toJson(details.opening_hours));
+                  if (details.opening_hours != null){
+                       //supersonic.logger.log("periods" + details.opening_hours.periods);
+                    if(details.opening_hours.weekday_text != undefined && details.opening_hours.weekday_text.length){
+                        openhours = details.opening_hours.weekday_text[day];
+                        openhours = openhours.split(/:(.+)?/)[1];
+                        //supersonic.logger.log("weekday:" + openhours);
+                    } else {
+                      if (details.opening_hours.open_now){
+                        openhours = "Open Now"
+                      } else {
+                        openhours = "Closed"
+                      }
+
+                      //supersonic.logger.log("No weekday:" + openhours);
+                    }
+                  } else {
+                    openhours = "No hours"
+                  }
+                  //var openhours = result.opening_hours.weekday_text[day];
+                  //supersonic.logger.log(openhours);
+                  //supersonic.logger.log("DEETAILS" + angular.toJson(details));
                   $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -279,8 +421,11 @@ angular
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
+                    type: result.types[0],
                     navstr: navstring,
-                    distance: distance
+                    distance: distance,
+                    openhours: openhours,
+                    website: details.website != undefined? details.website: ""
                   });
                 }
                 // supersonic.logger.log("162:" + $scope.places.length);
@@ -300,25 +445,45 @@ angular
 
                 }
                  supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
-                callback($scope.previousPlaces, $scope.places); 
+                 
                 $scope.$apply();
               }
-              });      
+              callback();  
+              });            
+            },
+            function(error)
+            {
+                supersonic.logger.log("loop done");
+                if(!compareArrays())
+                {
+                 //  supersonic.logger.log("firstTime" + firstTime);
+                 if(firstTime == 0)
+                 {
+                    supersonic.logger.log("firstime-pushnewplaces");
+                    $scope.pushNewPlaces();
+                 }
+                 else if(firstTime == 1)
+                 {
+                     newPlacesNearby();
+                 }
+                }
             });
         }  
       });
       $scope.filteredPlaces = $scope.places;
   }
     
-
-    NgMap.getMap().then(function(map) {
+   
+    NgMap.getMap().then(function(map1) {
+       map = map1;
       placeMarkerAndPanTo($scope.latlng, map);
-
-      $timeout($scope.startPlaces, 500);
+       $timeout($scope.startPlaces, 1500);  
+       $scope.showMap = false;
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
        $scope.prevLatLng = angular.copy($scope.latlng);
        $scope.latlng = e.latLng;
+       //$scope.$apply();
        //supersonic.logger.log("PREV LATLONG:" + $scope.prevLatLng.lat());
        //supersonic.logger.log("NEW LATLONG:" + $scope.latlng.lat());
        if($scope.refreshTime == 0)
@@ -415,52 +580,8 @@ angular
           return returnValue;
     }
 
-  function compareArrays(Array1, Array2){
-       // supersonic.logger.log("Compare Called:" + Array1.length + "," +  Array2.length);
-        // for (i = 0; i < Array2.length; i++){
-        //   var foundName = false;
-        //   for (j = 0; j < Array1.length; j++){
-        //     if (Array1[j].name == Array2[i].name){
-        //       foundName = true;
-        //     }
-        //   }
-        //   if (!foundName)
-        //     {return false;}
-        // }
-        // return true;
-        if($scope.prevLatLng == "")
-        {
-          supersonic.logger.log("1st time");
-            return false;
-        }
-        else
-        {
-          var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
-         supersonic.logger.log("DISTANCE in metres:"  + d);
 
-         if(d >= 2000)
-          {
-            return false;
-          }
-         else
-         {
-            return true;
-         }
-       }
 
-  }
-
-  function placeMarkerAndPanTo(latLng, map) {
-   if ($scope.marker){
-     $scope.marker.setMap(null);
-  }
-    var marker = new google.maps.Marker({
-      position: latLng,
-      map: map
-    });
-    $scope.marker = marker;
-    map.panTo(latLng);
-  }
 
 });
 });
