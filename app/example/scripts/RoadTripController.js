@@ -15,6 +15,9 @@ angular
     $scope.minRating = 0;
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
+
+    $scope.useDeviceLocation = true;
+
     var promise, map;
     supersonic.ui.tabs.hide();
       $scope.showMap = true;
@@ -61,6 +64,7 @@ supersonic.ui.navigationBar.update({
     $scope.toggleMap = function() {
       supersonic.logger.log("TOGGLEMAP!");
       $scope.showMap = !$scope.showMap;
+      $scope.useDeviceLocation = false;
       if($scope.showMap)
       {
         supersonic.logger.log("Create Map");
@@ -107,9 +111,17 @@ supersonic.ui.navigationBar.update({
       $scope.mapCenter = myLocation.lat() + "," +myLocation.lng();
 
 
-      function refreshPlaces () {
+    function refreshPlaces () {
       supersonic.logger.log("REFRESH CALLED");
       $scope.previousPlaces = $scope.places.slice();
+      
+      if ($scope.useDeviceLocation){
+        supersonic.device.geolocation.getPosition().then( function(position) {
+          var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          $scope.latlng = myLocation;
+        });
+      }
+
       findMeAwesomePlaces($scope.latlng, 1);
      // findMeAwesomePlaces($scope.latlng, function() {
      //  //supersonic.logger.log(angular.toJson($scope.visibleplaces));
