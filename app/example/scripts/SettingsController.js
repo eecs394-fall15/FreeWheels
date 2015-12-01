@@ -19,12 +19,22 @@ angular
       value: 'R'};
 
   	 $scope.typesList = [
-                  {'name':'Amusement','checked': true, 'icon':'ios-americanfootball-outline'},
-                  {'name':'Animals','checked': true,'icon':'ios-paw-outline'}, 
-                  {'name':'Library','checked': true, 'icon':'ios-book-outline'},
-                  {'name':'Museums and Art','checked': true, 'icon':'ios-flask-outline'},
-                  {'name':'Nature','checked': true, 'icon':'leaf'},
-                  {'name':'Places of worship','checked': true, 'icon':'ios-moon-outline'}];
+                  {'name':'Amusement Park', 'category':'amusement_park', 'checked': true},
+                  {'name':'Art Gallery', 'category':'art_gallery', 'checked': true},
+                  {'name':'Bowling Alley', 'category':'bowling_alley', 'checked': true},
+                  {'name':'Casino', 'category':'casino', 'checked': true},
+                  {'name':'Movie Theater', 'category':'movie_theater', 'checked': true},
+                  {'name':'Museum', 'category':'museum', 'checked': true},
+                  {'name':'Night Club', 'category':'night_club', 'checked': true},
+                  {'name':'Park', 'category':'park', 'checked': true},
+                  {'name':'Place of Worship', 'category':'place_of_worship', 'checked': true},
+                  {'name':'Restaurant', 'category':'restaurant', 'checked': true},
+                  {'name':'Spa', 'category':'spa', 'checked': true},
+                  {'name':'Stadium', 'category':'stadium', 'checked': true},
+                  {'name':'Store', 'category':'store', 'checked': true},
+                  {'name':'University', 'category':'university', 'checked': true},
+                  {'name':'Zoo', 'category':'zoo', 'checked': true}
+                  ];
 
       $scope.FrequencyList = [
                   {'name':'Manual', 'value': 100},

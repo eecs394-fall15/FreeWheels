@@ -12,7 +12,6 @@
 
   </super-navbar>
   
-  <!-- <body style="height:100%"> -->
 
 <div class="list" >
 
@@ -33,20 +32,12 @@
     Select Categories
     <i class="{{categoriesIcon}}"></i>
   </div>
-    <!-- <div class = "types" ng-hide = "hideTypesFilter">
-      <div class="item item-checkbox" "stylel" ng-repeat="type in typesList">
-           <label class="checkbox" >
-             <input type="checkbox" ng-model="type.checked" ng-click="submitFilters()">
-           </label> 
-           <i class="icon super-{{type.icon}}"></i>
-           {{type.name}}
-      </div>
-    </div> -->
+
      <div ng-hide="hideTypesFilter">
     <ul class="list-group" data-toggle="items">
       <div ng-repeat="type in typesList">
     <li class="list-group-item active" name="type" ng-model="type.checked" ng-click="SetCurrentType(type.name)">
-      <i class="icon super-{{type.icon}}"></i> {{type.name}}</li>
+      {{type.name}}</li>
   </div>
     </ul>
   </div>

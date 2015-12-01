@@ -88,13 +88,7 @@ supersonic.ui.navigationBar.update({
       }
     }
 
-    $scope.typesList = [
-                  {'name':'Animals','checked': true}, 
-                  {'name':'Library','checked': true},
-                  {'name':'Museums and Art','checked': true},
-                  {'name':'Nature','checked': true},
-                  {'name':'Amusement','checked': true},
-                  {'name':'Places of worship','checked': true}];
+    $scope.typesList = [];
 
     $scope.translate = function(value)
     {
@@ -158,17 +152,14 @@ supersonic.ui.navigationBar.update({
           var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
          supersonic.logger.log("DISTANCE in metres:"  + d);
 
-         if(d >= 1000)
+         if($scope.oldPlaces.length != $scope.places.length)
           {
-            supersonic.logger.log("success");
-            $scope.prevLatLng = $scope.latlng;
             return false;
 
           }
          else
          {
            supersonic.logger.log("failed");
-            
             return true;
          }
        }
@@ -292,7 +283,7 @@ supersonic.ui.navigationBar.update({
       angular.forEach(list, function(value, key)
       {
           if(value.checked == true)
-            filteredArray.push(value.name);
+            filteredArray.push(value.category);
       });
         return filteredArray;
     }
@@ -309,6 +300,7 @@ supersonic.ui.navigationBar.update({
    {
       supersonic.logger.log(myLocation);
       $scope.useOriginalArray = true;
+      $scope.oldPlaces = $scope.places;
       $scope.places = [];
       $scope.filteredPlaces = [];
       //var myLocation = new google.maps.LatLng(lat, longitude);
@@ -324,39 +316,8 @@ supersonic.ui.navigationBar.update({
                   'stadium',
                   'synagogue',
                   'natural_feature'];
-                  var requestTypes = [];
-      angular.forEach($scope.types, function(type)
-      {
-        if (type == 'Places of worship'){
-          requestTypes.push('church');
-          requestTypes.push('hindu_temple');
-          requestTypes.push('synagogue');
-          requestTypes.push('place_of_worship');
-          requestTypes.push('mosque');
-        }
-        else if (type == 'Museums and Art'){
-          requestTypes.push('museum');
-          requestTypes.push('art_gallery');
-        }
-        else if (type == 'Nature'){
-          requestTypes.push('park');
-          requestTypes.push('campground');
-          requestTypes.push('natural_feature');
-        }
-        else if (type == 'Amusement'){
-          requestTypes.push('stadium');
-          requestTypes.push('casino');
-          requestTypes.push('bowling_alley');
-          requestTypes.push('amusement_park');
-        }
-        else if (type == 'Library'){
-          requestTypes.push('library');
-        }
-        else if (type == 'Animals'){
-          requestTypes.push('zoo');
-          requestTypes.push('aquarium');
-        }
-      });
+                  var requestTypes = $scope.types;
+      
 
       // Specify location, radius and place types for your Places API search.
       var request = {
@@ -412,6 +373,16 @@ supersonic.ui.navigationBar.update({
                   //var openhours = result.opening_hours.weekday_text[day];
                   //supersonic.logger.log(openhours);
                   //supersonic.logger.log("DEETAILS" + angular.toJson(details));
+                  var grosstype = result.types[0];
+                  var find = '_';
+                  var re = new RegExp(find, 'g');
+
+                  var cleantype = grosstype.replace(re, ' ');
+                  cleantype = cleantype.replace(/\b./g, function(m){ return m.toUpperCase(); });
+                  
+
+
+
                   $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -421,7 +392,7 @@ supersonic.ui.navigationBar.update({
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
-                    type: result.types[0],
+                    type: cleantype,
                     navstr: navstring,
                     distance: distance,
                     openhours: openhours,
@@ -527,10 +498,11 @@ supersonic.ui.navigationBar.update({
       angular.forEach(list, function(value, key)
       {
           if(value.checked == true)
-            filteredArray.push(value.name);
+            filteredArray.push(value.category);
       });
         return filteredArray;
     }
+
 
     var matchType = function(type, placeType)
     {
