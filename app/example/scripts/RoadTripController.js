@@ -152,17 +152,14 @@ supersonic.ui.navigationBar.update({
           var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
          supersonic.logger.log("DISTANCE in metres:"  + d);
 
-         if(d >= 1000)
+         if($scope.oldPlaces.length != $scope.places.length)
           {
-            supersonic.logger.log("success");
-            $scope.prevLatLng = $scope.latlng;
             return false;
 
           }
          else
          {
            supersonic.logger.log("failed");
-            
             return true;
          }
        }
@@ -303,6 +300,7 @@ supersonic.ui.navigationBar.update({
    {
       supersonic.logger.log(myLocation);
       $scope.useOriginalArray = true;
+      $scope.oldPlaces = $scope.places;
       $scope.places = [];
       $scope.filteredPlaces = [];
       //var myLocation = new google.maps.LatLng(lat, longitude);
