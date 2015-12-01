@@ -152,17 +152,14 @@ supersonic.ui.navigationBar.update({
           var d  = google.maps.geometry.spherical.computeDistanceBetween($scope.prevLatLng, $scope.latlng);
          supersonic.logger.log("DISTANCE in metres:"  + d);
 
-         if(d >= 1000)
+         if($scope.oldPlaces.length != $scope.places.length)
           {
-            supersonic.logger.log("success");
-            $scope.prevLatLng = $scope.latlng;
             return false;
 
           }
          else
          {
            supersonic.logger.log("failed");
-            
             return true;
          }
        }
@@ -303,6 +300,7 @@ supersonic.ui.navigationBar.update({
    {
       supersonic.logger.log(myLocation);
       $scope.useOriginalArray = true;
+      $scope.oldPlaces = $scope.places;
       $scope.places = [];
       $scope.filteredPlaces = [];
       //var myLocation = new google.maps.LatLng(lat, longitude);
@@ -375,6 +373,16 @@ supersonic.ui.navigationBar.update({
                   //var openhours = result.opening_hours.weekday_text[day];
                   //supersonic.logger.log(openhours);
                   //supersonic.logger.log("DEETAILS" + angular.toJson(details));
+                  var grosstype = result.types[0];
+                  var find = '_';
+                  var re = new RegExp(find, 'g');
+
+                  var cleantype = grosstype.replace(re, ' ');
+                  cleantype = cleantype.replace(/\b./g, function(m){ return m.toUpperCase(); });
+                  
+
+
+
                   $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -384,7 +392,7 @@ supersonic.ui.navigationBar.update({
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
-                    type: result.types[0],
+                    type: cleantype,
                     navstr: navstring,
                     distance: distance,
                     openhours: openhours,
@@ -494,6 +502,7 @@ supersonic.ui.navigationBar.update({
       });
         return filteredArray;
     }
+
 
     var matchType = function(type, placeType)
     {
