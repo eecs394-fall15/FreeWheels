@@ -373,6 +373,16 @@ supersonic.ui.navigationBar.update({
                   //var openhours = result.opening_hours.weekday_text[day];
                   //supersonic.logger.log(openhours);
                   //supersonic.logger.log("DEETAILS" + angular.toJson(details));
+                  var grosstype = result.types[0];
+                  var find = '_';
+                  var re = new RegExp(find, 'g');
+
+                  var cleantype = grosstype.replace(re, ' ');
+                  cleantype = cleantype.replace(/\b./g, function(m){ return m.toUpperCase(); });
+                  
+
+
+
                   $scope.places.push({
                     name: result.name,
                     icon: result.icon,
@@ -382,7 +392,7 @@ supersonic.ui.navigationBar.update({
                     rating: result.rating,
                     photo: photo,
                     types: result.types,
-                    type: result.types[0],
+                    type: cleantype,
                     navstr: navstring,
                     distance: distance,
                     openhours: openhours,
@@ -492,6 +502,7 @@ supersonic.ui.navigationBar.update({
       });
         return filteredArray;
     }
+
 
     var matchType = function(type, placeType)
     {
