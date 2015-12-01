@@ -46,7 +46,7 @@
     <ul class="list-group" data-toggle="items">
       <div ng-repeat="type in typesList">
     <li class="list-group-item active" name="type" ng-model="type.checked" ng-click="SetCurrentType(type.name)">
-      <i class="icon super-{{type.icon}}"></i> {{type.name}}</li>
+      {{type.name}}</li>
   </div>
     </ul>
   </div>
