@@ -179,7 +179,7 @@ supersonic.ui.navigationBar.update({
     $scope.manualRefresh = function()
     {
       supersonic.logger.log("In manual refresh function");
-      $interval.cancel(promise);
+      //$interval.cancel(promise);
       refreshPlaces();
     }
 
@@ -261,6 +261,11 @@ supersonic.ui.navigationBar.update({
     });
       supersonic.data.channel('sorting').subscribe( function(value){
       $scope.sortBy = value;
+    });
+
+    supersonic.data.channel('startRefresh').subscribe( function(value){
+      supersonic.logger.log("startRefresh");
+      $scope.manualRefresh();
     });
 
       supersonic.data.channel('refreshTime').subscribe( function(value){

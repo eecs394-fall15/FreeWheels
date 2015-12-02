@@ -102,12 +102,11 @@ angular
    //    }
 
    $scope.removeView = function(){
+      supersonic.data.channel('startRefresh').publish("1");
    	var options = {
   		animate: false
-	}
-
-	supersonic.ui.modal.hide();
-
+	   }
+	   supersonic.ui.modal.hide();
    }
 
    $scope.hideTypesFilters = function(){
