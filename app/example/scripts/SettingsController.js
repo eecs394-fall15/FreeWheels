@@ -49,7 +49,7 @@ angular
                   {'name':'3 Stars & Up','value': 3},
                   {'name':'2 Stars & up','value': 2},
                   {'name':'1 Star & up','value': 1}, 
-                  {'name':'No Ratings','value': 0}];
+                  {'name':'Show All','value': 0}];
 
       $scope.SortingList = [
                   {'name':'Distance', 'value': 'D'},

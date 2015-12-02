@@ -16,6 +16,8 @@ angular
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
 
+    $scope.showRefreshing = false;
+
     $scope.useDeviceLocation = true;
 
     var promise, map;
@@ -30,8 +32,15 @@ angular
   styleId: "nav-filter"
 })
 
+  var changeRefresh = function()
+  {
+    $scope.showRefreshing = false;
+  }
+
 var refreshBtn = new supersonic.ui.NavigationBarButton({
   onTap: function() {
+    $scope.showRefreshing = true;
+    $timeout(changeRefresh, 1000); 
    $scope.manualRefresh();
   },
   styleId: "nav-refresh"
@@ -179,6 +188,7 @@ supersonic.ui.navigationBar.update({
       supersonic.logger.log("NEW PLACES:" + $scope.places.length);
       if($scope.places.length) {
       $scope.my.newPlaces = true;
+      $scope.showRefreshing = false;
       }
     }
 
