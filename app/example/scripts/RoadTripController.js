@@ -397,22 +397,23 @@ supersonic.ui.navigationBar.update({
                   
 
 
-
-                  $scope.places.push({
-                    name: result.name,
-                    icon: result.icon,
-                    vicinity: result.vicinity,
-                    address: details.formatted_address,
-                    phone: details.formatted_phone_number,
-                    rating: result.rating,
-                    photo: photo,
-                    types: result.types,
-                    type: cleantype,
-                    navstr: navstring,
-                    distance: distance,
-                    openhours: openhours,
-                    website: details.website != undefined? details.website: ""
-                  });
+                  if (distance <= $scope.radiusSlider){
+                    $scope.places.push({
+                      name: result.name,
+                      icon: result.icon,
+                      vicinity: result.vicinity,
+                      address: details.formatted_address,
+                      phone: details.formatted_phone_number,
+                      rating: result.rating,
+                      photo: photo,
+                      types: result.types,
+                      type: cleantype,
+                      navstr: navstring,
+                      distance: distance,
+                      openhours: openhours,
+                      website: details.website != undefined? details.website: ""
+                    });
+                  }
                 }
                 // supersonic.logger.log("162:" + $scope.places.length);
                 if($scope.sortBy == 'R')
