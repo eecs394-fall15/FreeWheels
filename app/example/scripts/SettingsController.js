@@ -45,15 +45,15 @@ angular
                   {'name':'Every hour', 'value': 60}];
 
        $scope.RatingList = [
-                  {'name':'4 Stars & Up', 'value': 4},
-                  {'name':'3 Stars & Up','value': 3},
-                  {'name':'2 Stars & up','value': 2},
-                  {'name':'1 Star & up','value': 1}, 
-                  {'name':'Show All','value': 0}];
+                  {'name':'4 Stars & Up', 'value': 4, 'active':'active'},
+                  {'name':'3 Stars & Up','value': 3, 'active':false},
+                  {'name':'2 Stars & up','value': 2, 'active':false},
+                  {'name':'1 Star & up','value': 1, 'active':false}, 
+                  {'name':'Show All','value': 0, 'active':false}];
 
       $scope.SortingList = [
-                  {'name':'Distance', 'value': 'D'},
-                  {'name':'Rating','value': 'R'}];
+                  {'name':'Distance', 'value': 'D', 'active':false},
+                  {'name':'Rating','value': 'R', 'active': 'active'}];
 
      $scope.hideTypesFilter = true;
      $scope.hideFrequencyFilter = true;
