@@ -116,26 +116,34 @@ supersonic.ui.navigationBar.update({
 
     function refreshPlaces () {
       supersonic.logger.log("REFRESH CALLED");
+      $scope.showRefreshing = true;
+     $timeout(changeRefresh, 1000); 
       $scope.previousPlaces = $scope.places.slice();
       
       if ($scope.useDeviceLocation){
         supersonic.device.geolocation.getPosition().then( function(position) {
           var myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          supersonic.logger.log("My current location" + myLocation);
           $scope.latlng = myLocation;
+          findMeAwesomePlaces($scope.latlng, 1);
         });
       }
-
-      findMeAwesomePlaces($scope.latlng, 1);
+      else
+      {
+        supersonic.logger.log("prevLatLng:" + $scope.prevLatLng + "newlatlng:" + $scope.latlng); 
+        findMeAwesomePlaces($scope.latlng, 1);
+      
+     }
+   }
      // findMeAwesomePlaces($scope.latlng, function() {
      //  //supersonic.logger.log(angular.toJson($scope.visibleplaces));
      //  if (!compareArrays(arr1, arr2)){
      //    newPlacesNearby();
      //  }
      // });
-    }
 
     $scope.startPlaces = function() {
-     supersonic.logger.log("lat long start: " + $scope.latlng);
+    // supersonic.logger.log("lat long start: " + $scope.latlng);
       //$scope.prevLatLng = $scope.latlng;
       // $scope.previousPlaces = $scope.places.slice();
       findMeAwesomePlaces($scope.latlng, 0);
@@ -148,7 +156,7 @@ supersonic.ui.navigationBar.update({
 
     
     function compareArrays(){
-       supersonic.logger.log("compareArrays:PREV:" + $scope.prevLatLng + ",CURRENT:" +  $scope.latlng);
+       //supersonic.logger.log("compareArrays:PREV:" + $scope.prevLatLng + ",CURRENT:" +  $scope.latlng);
 
         if($scope.prevLatLng == "")
         {
@@ -185,15 +193,16 @@ supersonic.ui.navigationBar.update({
 
     function newPlacesNearby()
     {
-      supersonic.logger.log("NEW PLACES:" + $scope.places.length);
+     // supersonic.logger.log("NEW PLACES:" + $scope.places.length);
       if($scope.places.length) {
       $scope.my.newPlaces = true;
       $scope.showRefreshing = false;
       }
+      $scope.prevLatLng = angular.copy($scope.latlng);
     }
 
     $scope.pushNewPlaces = function() {
-      supersonic.logger.log("FIRST TIME NEW PLACES:" + $scope.places.length);
+     // supersonic.logger.log("FIRST TIME NEW PLACES:" + $scope.places.length);
       $scope.visibleplaces = angular.copy($scope.places);
       $scope.my.newPlaces = false;
     }
@@ -431,7 +440,7 @@ supersonic.ui.navigationBar.update({
                     });
 
                 }
-                 supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
+                // supersonic.logger.log("SCOPE.place in line 173:" + angular.toJson($scope.places));     
                  
                 $scope.$apply();
               }

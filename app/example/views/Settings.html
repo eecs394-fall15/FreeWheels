@@ -50,7 +50,7 @@
     <div ng-hide="hideFrequencyFilter">
     <ul class="list-group">
       <div ng-repeat="type in FrequencyList">
-    <li class="list-group-item" name="frequency" ng-model="selectedFrequency.value" ng-click="SetCurrentItem(type.value)">{{type.name}}</li>
+    <li class="list-group-item {{type.active}}" name="frequency" ng-model="selectedFrequency.value" ng-click="SetCurrentItem(type.value)">{{type.name}}</li>
   </div>
     </ul>
   </div>
