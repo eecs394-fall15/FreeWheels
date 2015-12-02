@@ -21,6 +21,7 @@
       <span style="float: right;">Open: {{place.openhours}}</span></p>
       <bs-rating value={{place.rating}} data-show-clear="false" data-size="xs" readonly="true"></bs-rating>
        <p> <a ng-click = "openWebsite(place.website)">{{place.website}}</a></p>
+       <p>Contact: {{place.phone}}</p>
         <p style="text-align: center;">
         <button class="button" id="navbutton" ng-click="openGoogleMaps(place.navstr)">Navigate</button>
         </p>

@@ -448,7 +448,7 @@ supersonic.ui.navigationBar.update({
     NgMap.getMap().then(function(map1) {
        map = map1;
       placeMarkerAndPanTo($scope.latlng, map);
-       $timeout($scope.startPlaces, 1500);  
+     
        $scope.showMap = false;
       map.addListener('click', function(e) {
        placeMarkerAndPanTo(e.latLng, map);
@@ -460,6 +460,7 @@ supersonic.ui.navigationBar.update({
        if($scope.refreshTime == 0)
           refreshPlaces();
       });
+        $timeout($scope.startPlaces, 2000);  
     });
 
    
