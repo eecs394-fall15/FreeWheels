@@ -37,12 +37,12 @@ angular
                   ];
 
       $scope.FrequencyList = [
-                  {'name':'Manual', 'value': 100},
-                  {'name':'Every 10 seconds (Default)','value': 1/6},
-                  {'name':'Every 5 minutes','value': 5}, 
-                  {'name':'Every 10 minutes','value': 10},
-                  {'name':'Every 30 minutes','value': 30},
-                  {'name':'Every hour', 'value': 60}];
+                  {'name':'Manual', 'value': 100, 'active':false},
+                  {'name':'Every 10 seconds','value': 1/6, 'active':'active'},
+                  {'name':'Every 5 minutes','value': 5, 'active':false}, 
+                  {'name':'Every 10 minutes','value': 10, 'active':false},
+                  {'name':'Every 30 minutes','value': 30, 'active':false},
+                  {'name':'Every hour', 'value': 60, 'active':false}];
 
        $scope.RatingList = [
                   {'name':'4 Stars & Up', 'value': 4, 'active':'active'},
