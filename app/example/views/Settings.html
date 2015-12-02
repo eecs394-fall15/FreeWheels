@@ -62,7 +62,7 @@
     <div ng-hide="hideRatingFilter">
     <ul class="list-group">
       <div ng-repeat="type in RatingList">
-    <li class="list-group-item" name="rating" ng-model="selectedRating.value" ng-click="SetCurrentRating(type.value)">{{type.name}}</li>
+    <li class="list-group-item {{type.active}}" name="rating" ng-model="selectedRating.value" ng-click="SetCurrentRating(type.value)">{{type.name}}</li>
   </div>
     </ul>
   </div>
@@ -74,7 +74,7 @@
     <div ng-hide="hideSortingFilter">
     <ul class="list-group">
       <div ng-repeat="type in SortingList">
-    <li class="list-group-item" name="sorting" ng-model="selectedSorting.value" ng-click="SetCurrentSorting(type.value)">{{type.name}}</li>
+    <li class="list-group-item {{type.active}}" name="sorting" ng-model="selectedSorting.value" ng-click="SetCurrentSorting(type.value)">{{type.name}}</li>
   </div>
     </ul>
   </div>

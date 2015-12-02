@@ -16,6 +16,8 @@ angular
     $scope.sortBy = 'R';
     $scope.prevLatLng = "";
 
+    $scope.showRefreshing = false;
+
     $scope.useDeviceLocation = true;
 
     var promise, map;
@@ -30,8 +32,15 @@ angular
   styleId: "nav-filter"
 })
 
+  var changeRefresh = function()
+  {
+    $scope.showRefreshing = false;
+  }
+
 var refreshBtn = new supersonic.ui.NavigationBarButton({
   onTap: function() {
+    $scope.showRefreshing = true;
+    $timeout(changeRefresh, 1000); 
    $scope.manualRefresh();
   },
   styleId: "nav-refresh"
@@ -170,7 +179,7 @@ supersonic.ui.navigationBar.update({
     $scope.manualRefresh = function()
     {
       supersonic.logger.log("In manual refresh function");
-      $interval.cancel(promise);
+      //$interval.cancel(promise);
       refreshPlaces();
     }
 
@@ -179,6 +188,7 @@ supersonic.ui.navigationBar.update({
       supersonic.logger.log("NEW PLACES:" + $scope.places.length);
       if($scope.places.length) {
       $scope.my.newPlaces = true;
+      $scope.showRefreshing = false;
       }
     }
 
@@ -251,6 +261,11 @@ supersonic.ui.navigationBar.update({
     });
       supersonic.data.channel('sorting').subscribe( function(value){
       $scope.sortBy = value;
+    });
+
+    supersonic.data.channel('startRefresh').subscribe( function(value){
+      supersonic.logger.log("startRefresh");
+      $scope.manualRefresh();
     });
 
       supersonic.data.channel('refreshTime').subscribe( function(value){
@@ -382,22 +397,23 @@ supersonic.ui.navigationBar.update({
                   
 
 
-
-                  $scope.places.push({
-                    name: result.name,
-                    icon: result.icon,
-                    vicinity: result.vicinity,
-                    address: details.formatted_address,
-                    phone: details.formatted_phone_number,
-                    rating: result.rating,
-                    photo: photo,
-                    types: result.types,
-                    type: cleantype,
-                    navstr: navstring,
-                    distance: distance,
-                    openhours: openhours,
-                    website: details.website != undefined? details.website: ""
-                  });
+                  if (distance <= $scope.radiusSlider){
+                    $scope.places.push({
+                      name: result.name,
+                      icon: result.icon,
+                      vicinity: result.vicinity,
+                      address: details.formatted_address,
+                      phone: details.formatted_phone_number,
+                      rating: result.rating,
+                      photo: photo,
+                      types: result.types,
+                      type: cleantype,
+                      navstr: navstring,
+                      distance: distance,
+                      openhours: openhours,
+                      website: details.website != undefined? details.website: ""
+                    });
+                  }
                 }
                 // supersonic.logger.log("162:" + $scope.places.length);
                 if($scope.sortBy == 'R')
