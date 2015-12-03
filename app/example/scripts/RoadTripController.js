@@ -358,7 +358,7 @@ supersonic.ui.navigationBar.update({
                 {
                  var photo = details.photos[0].getUrl({'maxWidth': 300});
                  //supersonic.logger.log(photo);
-                 var navstring = "comgooglemaps://?daddr="+result.geometry.location.toUrlValue();
+                 var navstring = "comgooglemaps://?saddr=" + $scope.latlng.lat() + "," +$scope.latlng.lng() + "&daddr="+result.geometry.location.toUrlValue();
                  var distance = google.maps.geometry.spherical.computeDistanceBetween($scope.latlng, result.geometry.location) * 0.000621371;
                  if((result.rating >= $scope.minRating) || (result.rating == null && $scope.minRating == 0))
                 {
