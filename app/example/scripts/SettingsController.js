@@ -45,11 +45,11 @@ angular
                   {'name':'Every hour', 'value': 60, 'active':false}];
 
        $scope.RatingList = [
-                  {'name':'4 Stars & Up', 'value': 4, 'active':'active'},
+                  {'name':'4 Stars & Up', 'value': 4, 'active':false},
                   {'name':'3 Stars & Up','value': 3, 'active':false},
                   {'name':'2 Stars & up','value': 2, 'active':false},
                   {'name':'1 Star & up','value': 1, 'active':false}, 
-                  {'name':'Show All','value': 0, 'active':false}];
+                  {'name':'Show All','value': 0, 'active':'active'}];
 
       $scope.SortingList = [
                   {'name':'Distance', 'value': 'D', 'active':false},
