@@ -2,6 +2,13 @@
 FreeWheels -- A roadtrip POI app built on Google Places API
 ====================================
 
+## DEVELOPER TEAM
+
+* Abhishek Raj
+* Anuj Iravane
+* Sam Cohen
+* Matt Jaffe
+
 ## DESCRIPTION
 
 FreeWheels is an iOS app to tell you about awesome places nearby when on a roadtrip. 
@@ -25,23 +32,27 @@ FreeWheels can show you the cool nearby:
 
 So you can focus on the road.
 
+## VIEW A DEMO
+
+The app is built via the AppGyver Cloud Share service. Follow [this link](https://share.appgyver.com/?id=91332&hash=f309fba9033c55ed8aed34c65decaac4aed8f1dd4a3cfe9169fce11e52bc54a5) to view it in a browser emulator or find out how to view it on your iOS device. Android devices are not supported.
+
 ## SYSTEM REQUIREMENTS
 
-- Steroids 4.1.22 
+- [AppGyver Supersonic](http://www.appgyver.io/supersonic/)
 - Node.js 0.10.x+ 
 - NPM   
 
-## SECURITY
+## RUNNING
 
-Don't commit Parse logins and Google API keys to git!
-
-## INSTALLATION
-
-To build FreeWheels, simply fork the repository, plug in Parse and Google API keys, and run:
+To build FreeWheels, simply fork the repository, and run:
 
 ```bash
+$ steroids update
 $ steroids connect
 ```
+
+## CODE
+FreeWheels is built using AppGyver’s Supersonic framework. The app is coded in AngularJS. 
 
 ## API KEY
 
